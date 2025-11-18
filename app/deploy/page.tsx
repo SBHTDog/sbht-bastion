@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import Card from "@/components/ui/card";
 import Badge from "@/components/ui/badge";
 
@@ -30,57 +31,79 @@ export default function DeployMonitor() {
   ];
 
   return (
-    <div className="min-h-screen p-8">
-      <div className="container mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50">
+      {/* Navigation */}
+      <nav className="bg-white/80 backdrop-blur-md border-b border-blue-100 sticky top-0 z-50">
+        <div className="container mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            <Link href="/" className="text-2xl font-bold text-blue-600">
+              ⚾ Deploy Monitor
+            </Link>
+            <div className="flex gap-6 items-center">
+              <Link href="/dashboard" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">
+                Dashboard
+              </Link>
+              <Link href="/deploy" className="text-blue-600 font-semibold">
+                Deploy
+              </Link>
+              <Link href="/history" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">
+                History
+              </Link>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <div className="container mx-auto p-8">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Deploy Monitor</h1>
-          <p className="text-gray-400">frontend-app • main branch • v1.2.3</p>
+        <div className="mb-10">
+          <h1 className="text-4xl font-bold mb-3 text-gray-800">⚾ Deploy Monitor</h1>
+          <p className="text-gray-600 text-lg">frontend-app • main branch • v1.2.3</p>
         </div>
 
         {/* Baseball Scoreboard */}
         <Card className="mb-8">
-          <div className="mb-6">
-            <h2 className="text-2xl font-bold mb-2">⚾ Deployment Progress</h2>
+          <div className="mb-8">
+            <h2 className="text-3xl font-bold mb-4 text-gray-800">Deployment Progress</h2>
             <div className="flex gap-4 items-center">
               <Badge variant="warning">In Progress</Badge>
-              <span className="text-gray-400">Stage 4 of 9</span>
-              <span className="text-gray-400">• Elapsed: 1m 12s</span>
+              <span className="text-gray-600 font-medium">Stage 4 of 9</span>
+              <span className="text-gray-500">• Elapsed: 1m 12s</span>
             </div>
           </div>
 
           {/* Scoreboard Grid */}
-          <div className="grid grid-cols-3 gap-4 mb-6">
+          <div className="grid grid-cols-3 gap-6 mb-8">
             {stages.map((stage, index) => (
               <div
                 key={index}
-                className={`p-4 rounded-lg border-2 ${
+                className={`p-6 rounded-xl border-2 transition-all ${
                   stage.status === "success"
-                    ? "border-green-500 bg-green-500/10"
+                    ? "border-green-400 bg-green-50 shadow-md"
                     : stage.status === "in_progress"
-                    ? "border-yellow-500 bg-yellow-500/10"
-                    : "border-gray-700 bg-gray-800/50"
+                    ? "border-blue-500 bg-blue-50 shadow-lg"
+                    : "border-gray-200 bg-white/50"
                 }`}
               >
-                <div className="flex justify-between items-start mb-2">
-                  <span className="font-bold">{index + 1}</span>
+                <div className="flex justify-between items-start mb-3">
+                  <span className="font-bold text-lg text-gray-700">{index + 1}</span>
                   {stage.status === "success" && (
-                    <span className="text-green-500">✓</span>
+                    <span className="text-green-600 text-xl">✓</span>
                   )}
                   {stage.status === "in_progress" && (
-                    <span className="text-yellow-500 animate-pulse">⏳</span>
+                    <span className="text-blue-600 animate-pulse text-xl">⏳</span>
                   )}
                 </div>
-                <div className="text-sm font-medium mb-1">{stage.name}</div>
-                <div className="text-xs text-gray-400">{stage.duration}</div>
+                <div className="text-base font-bold mb-2 text-gray-800">{stage.name}</div>
+                <div className="text-sm text-gray-600 font-medium">{stage.duration}</div>
               </div>
             ))}
           </div>
 
           {/* Progress Bar */}
-          <div className="relative h-2 bg-gray-700 rounded-full overflow-hidden">
+          <div className="relative h-3 bg-gray-200 rounded-full overflow-hidden">
             <div
-              className="absolute top-0 left-0 h-full blue-gradient"
+              className="absolute top-0 left-0 h-full blue-gradient transition-all duration-500"
               style={{ width: "44%" }}
             />
           </div>
@@ -88,8 +111,8 @@ export default function DeployMonitor() {
 
         {/* Logs */}
         <Card>
-          <h2 className="text-xl font-bold mb-4">📋 Deployment Logs</h2>
-          <div className="dev-minimal p-4 rounded-lg h-64 overflow-y-auto font-mono text-sm">
+          <h2 className="text-2xl font-bold mb-6 text-gray-800">📋 Deployment Logs</h2>
+          <div className="dev-minimal h-64 overflow-y-auto font-mono text-sm">
             {logs.map((log, index) => (
               <div key={index} className="mb-1">
                 {log}
@@ -101,16 +124,16 @@ export default function DeployMonitor() {
         {/* Quick Stats */}
         <div className="grid md:grid-cols-3 gap-6 mt-8">
           <Card>
-            <div className="text-gray-400 text-sm mb-2">Stages Completed</div>
-            <div className="text-2xl font-bold">3 / 9</div>
+            <div className="text-gray-600 text-sm mb-2 font-medium">Stages Completed</div>
+            <div className="text-3xl font-bold text-blue-600">3 / 9</div>
           </Card>
           <Card>
-            <div className="text-gray-400 text-sm mb-2">Success Rate</div>
-            <div className="text-2xl font-bold text-green-500">100%</div>
+            <div className="text-gray-600 text-sm mb-2 font-medium">Success Rate</div>
+            <div className="text-3xl font-bold text-green-600">100%</div>
           </Card>
           <Card>
-            <div className="text-gray-400 text-sm mb-2">Estimated Time</div>
-            <div className="text-2xl font-bold">~3m 45s</div>
+            <div className="text-gray-600 text-sm mb-2 font-medium">Estimated Time</div>
+            <div className="text-3xl font-bold text-blue-600">~3m 45s</div>
           </Card>
         </div>
       </div>

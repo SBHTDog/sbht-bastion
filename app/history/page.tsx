@@ -1,3 +1,4 @@
+import Link from "next/link";
 import Card from "@/components/ui/card";
 import Badge from "@/components/ui/badge";
 
@@ -42,30 +43,52 @@ export default function History() {
   ];
 
   return (
-    <div className="min-h-screen p-8">
-      <div className="container mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50">
+      {/* Navigation */}
+      <nav className="bg-white/80 backdrop-blur-md border-b border-blue-100 sticky top-0 z-50">
+        <div className="container mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            <Link href="/" className="text-2xl font-bold text-blue-600">
+              ⚾ Deploy Monitor
+            </Link>
+            <div className="flex gap-6 items-center">
+              <Link href="/dashboard" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">
+                Dashboard
+              </Link>
+              <Link href="/deploy" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">
+                Deploy
+              </Link>
+              <Link href="/history" className="text-blue-600 font-semibold">
+                History
+              </Link>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <div className="container mx-auto p-8">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Deployment History</h1>
-          <p className="text-gray-400">View all past deployments</p>
+        <div className="mb-10">
+          <h1 className="text-4xl font-bold mb-2 text-gray-800">Deployment History</h1>
+          <p className="text-gray-600 text-lg">View all past deployments</p>
         </div>
 
         {/* Filters */}
-        <Card className="mb-6">
+        <Card className="mb-8">
           <div className="flex gap-4">
-            <select className="bg-gray-800 border border-gray-700 rounded px-4 py-2 text-gray-300">
+            <select className="bg-white border-2 border-blue-200 rounded-lg px-4 py-2.5 text-gray-700 font-medium focus:border-blue-500 focus:outline-none">
               <option>All Projects</option>
               <option>frontend-app</option>
               <option>api-server</option>
               <option>mobile-app</option>
             </select>
-            <select className="bg-gray-800 border border-gray-700 rounded px-4 py-2 text-gray-300">
+            <select className="bg-white border-2 border-blue-200 rounded-lg px-4 py-2.5 text-gray-700 font-medium focus:border-blue-500 focus:outline-none">
               <option>All Status</option>
               <option>Success</option>
               <option>Failed</option>
               <option>In Progress</option>
             </select>
-            <select className="bg-gray-800 border border-gray-700 rounded px-4 py-2 text-gray-300">
+            <select className="bg-white border-2 border-blue-200 rounded-lg px-4 py-2.5 text-gray-700 font-medium focus:border-blue-500 focus:outline-none">
               <option>Last 7 days</option>
               <option>Last 30 days</option>
               <option>Last 90 days</option>
@@ -74,13 +97,13 @@ export default function History() {
         </Card>
 
         {/* Deployment List */}
-        <div className="space-y-4">
+        <div className="space-y-6">
           {deployments.map((deploy) => (
             <Card key={deploy.id}>
               <div className="flex justify-between items-center">
                 <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <h3 className="text-xl font-bold">{deploy.project}</h3>
+                  <div className="flex items-center gap-3 mb-3">
+                    <h3 className="text-xl font-bold text-gray-800">{deploy.project}</h3>
                     <Badge
                       variant={
                         deploy.status === "success"
@@ -92,20 +115,20 @@ export default function History() {
                     >
                       {deploy.status}
                     </Badge>
-                    <span className="text-gray-400 text-sm">{deploy.version}</span>
+                    <span className="text-gray-600 text-sm font-medium">{deploy.version}</span>
                   </div>
-                  <div className="dev-minimal p-3 rounded text-sm inline-block">
+                  <div className="dev-minimal text-sm inline-block">
                     <span className="text-gray-400">Branch:</span> {deploy.branch} •
                     <span className="text-gray-400"> Duration:</span> {deploy.duration} •
                     <span className="text-gray-400"> Time:</span> {deploy.time}
                   </div>
                 </div>
-                <div className="flex gap-2">
-                  <button className="px-4 py-2 text-sm text-gray-300 hover:text-white">
+                <div className="flex gap-3">
+                  <button className="px-5 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors">
                     View Details
                   </button>
                   {deploy.status === "failed" && (
-                    <button className="px-4 py-2 text-sm text-red-500 hover:text-red-400">
+                    <button className="px-5 py-2 text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors">
                       View Error
                     </button>
                   )}
@@ -116,20 +139,20 @@ export default function History() {
         </div>
 
         {/* Pagination */}
-        <div className="flex justify-center gap-2 mt-8">
-          <button className="px-4 py-2 bg-gray-800 rounded hover:bg-gray-700">
+        <div className="flex justify-center gap-3 mt-10">
+          <button className="px-5 py-2.5 bg-white border-2 border-blue-200 rounded-lg text-gray-700 font-medium hover:bg-blue-50 hover:border-blue-300 transition-colors">
             Previous
           </button>
-          <button className="px-4 py-2 blue-gradient rounded text-white">
+          <button className="px-5 py-2.5 blue-gradient rounded-lg text-white font-medium shadow-md">
             1
           </button>
-          <button className="px-4 py-2 bg-gray-800 rounded hover:bg-gray-700">
+          <button className="px-5 py-2.5 bg-white border-2 border-blue-200 rounded-lg text-gray-700 font-medium hover:bg-blue-50 hover:border-blue-300 transition-colors">
             2
           </button>
-          <button className="px-4 py-2 bg-gray-800 rounded hover:bg-gray-700">
+          <button className="px-5 py-2.5 bg-white border-2 border-blue-200 rounded-lg text-gray-700 font-medium hover:bg-blue-50 hover:border-blue-300 transition-colors">
             3
           </button>
-          <button className="px-4 py-2 bg-gray-800 rounded hover:bg-gray-700">
+          <button className="px-5 py-2.5 bg-white border-2 border-blue-200 rounded-lg text-gray-700 font-medium hover:bg-blue-50 hover:border-blue-300 transition-colors">
             Next
           </button>
         </div>
