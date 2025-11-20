@@ -9,6 +9,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
+import { useMockAuth } from "@/contexts/MockAuthContext";
 import { debugLog } from "@/lib/types";
 
 interface ProtectedRouteProps {
@@ -16,11 +17,18 @@ interface ProtectedRouteProps {
 }
 
 export default function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { isAuthenticated, isLoading } = useAuth();
+  const auth = useAuth();
+  const mockAuth = useMockAuth();
   const router = useRouter();
+
+  // MockAuth 또는 Auth 중 하나라도 인증되어 있으면 OK
+  const isAuthenticated = auth.isAuthenticated || mockAuth.isAuthenticated;
+  const isLoading = auth.isLoading || mockAuth.isLoading;
 
   useEffect(() => {
     debugLog("ProtectedRoute", "Check auth", {
+      authIsAuthenticated: auth.isAuthenticated,
+      mockIsAuthenticated: mockAuth.isAuthenticated,
       isAuthenticated,
       isLoading,
     });

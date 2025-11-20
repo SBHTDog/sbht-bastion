@@ -42,11 +42,27 @@ export default function DeployReportPage() {
     <ProtectedRoute>
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50">
         {/* Navigation */}
-        <nav className="bg-white/80 backdrop-blur-md border-b border-blue-100 sticky top-0 z-50">
+        <nav className="bg-white/90 backdrop-blur-sm border-b border-blue-100 sticky top-0 z-40">
           <div className="container mx-auto px-6 py-4">
-            <Link href="/" className="text-2xl font-bold text-blue-600">
-              Deploy Monitor
-            </Link>
+            <div className="flex items-center justify-between">
+              <Link href="/" className="text-xl font-bold text-blue-600">
+                Deploy Monitor
+              </Link>
+              <div className="flex gap-6 items-center">
+                <Link href="/dashboard" className="text-gray-600 hover:text-blue-600 font-medium">
+                  Dashboard
+                </Link>
+                <Link href={`/project/${projectId}`} className="text-gray-600 hover:text-blue-600 font-medium">
+                  Project
+                </Link>
+                <Link href="/history" className="text-blue-600 font-bold">
+                  History
+                </Link>
+                <Link href={`/project/${projectId}/deploy`} className="text-gray-600 hover:text-blue-600 font-medium">
+                  Deploy
+                </Link>
+              </div>
+            </div>
           </div>
         </nav>
 
@@ -179,7 +195,7 @@ export default function DeployReportPage() {
           )}
 
           {/* 공유 버튼 */}
-          <Card>
+          <Card className="mb-8">
             <div className="flex justify-between items-center">
               <div>
                 <h3 className="text-xl font-bold text-gray-800 mb-1">리포트 공유</h3>
@@ -195,6 +211,27 @@ export default function DeployReportPage() {
               </Button>
             </div>
           </Card>
+
+          {/* 추가 액션 버튼들 */}
+          <div className="flex gap-4 justify-center">
+            <Link href={`/project/${projectId}`}>
+              <Button size="lg" variant="secondary" className="px-8">
+                프로젝트로 돌아가기
+              </Button>
+            </Link>
+            <Link href="/history">
+              <Button size="lg" variant="secondary" className="px-8">
+                배포 히스토리 보기
+              </Button>
+            </Link>
+            {!isSuccess && (
+              <Link href={`/project/${projectId}/deploy`}>
+                <Button size="lg" className="px-8">
+                  다시 배포하기
+                </Button>
+              </Link>
+            )}
+          </div>
         </div>
       </div>
     </ProtectedRoute>

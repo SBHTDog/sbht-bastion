@@ -7,6 +7,7 @@ import Link from "next/link";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import Card from "@/components/ui/card";
 import Badge from "@/components/ui/badge";
+import DeployResult from "@/components/deploy/DeployResult";
 import { mockProjects, mockDeployments } from "@/lib/mockData";
 import { debugLog } from "@/lib/types";
 
@@ -18,50 +19,158 @@ export default function DeployPage() {
   const [currentStage, setCurrentStage] = useState(0);
   const [logs, setLogs] = useState<string[]>([]);
   const [isComplete, setIsComplete] = useState(false);
+  const [deployStatus, setDeployStatus] = useState<"success" | "failed" | null>(null);
+  const [stageResults, setStageResults] = useState<Array<{
+    name: string;
+    status: "success" | "failed" | "skipped";
+    duration: number;
+  }>>([]);
+  const [startTime] = useState(Date.now());
+  const [baseballCommentary, setBaseballCommentary] = useState("🎤 플레이볼! 배포 경기가 곧 시작됩니다!");
 
   const project = mockProjects.find((p) => p.id === projectId);
   const deploymentTemplate = mockDeployments[0]; // 템플릿으로 사용
 
   const stages = [
-    { name: "Checkout", duration: 5000 },
-    { name: "Dependencies", duration: 8000 },
-    { name: "Lint", duration: 3000 },
-    { name: "Test", duration: 10000 },
-    { name: "Build", duration: 15000 },
-    { name: "Security Scan", duration: 5000 },
-    { name: "Push ECR", duration: 3000 },
-    { name: "Deploy", duration: 8000 },
-    { name: "Health Check", duration: 3000 },
+    { name: "Checkout", duration: 2000, baseball: "선발 투수 Checkout이 마운드에 오릅니다!" },
+    { name: "Dependencies", duration: 3000, baseball: "Dependencies, 강속구로 삼진을 잡아냅니다!" },
+    { name: "Lint", duration: 2000, baseball: "Lint 타자, 깔끔한 안타를 쳐냅니다!" },
+    { name: "Test", duration: 4000, failChance: 0.3, baseball: "Test, 풀카운트 승부 중입니다... 긴장감이 감돕니다!" },
+    { name: "Build", duration: 5000, baseball: "Build 타자가 방망이를 힘차게 휘두릅니다!" },
+    { name: "Security Scan", duration: 2000, baseball: "Security Scan, 수비가 탄탄합니다!" },
+    { name: "Push ECR", duration: 2000, baseball: "Push ECR, 주자가 베이스를 훔칩니다!" },
+    { name: "Deploy", duration: 3000, baseball: "Deploy, 결정적인 타석에 들어섭니다!" },
+    { name: "Health Check", duration: 2000, baseball: "Health Check, 마지막 수비를 준비합니다!" },
   ];
+
+  // 배포 재시도
+  const handleRetry = () => {
+    setCurrentStage(0);
+    setLogs([]);
+    setIsComplete(false);
+    setDeployStatus(null);
+    setStageResults([]);
+    setBaseballCommentary("🎤 재경기 시작! 다시 한 번 도전합니다!");
+  };
 
   // 배포 시뮬레이션
   useEffect(() => {
-    if (currentStage >= stages.length) {
-      setIsComplete(true);
-      debugLog("Deploy", "Deployment complete", { projectId });
+    if (deployStatus !== null) return; // 이미 완료된 경우 실행하지 않음
 
-      // 3초 후 리포트 페이지로 이동
-      setTimeout(() => {
-        router.push(`/project/${projectId}/reports/deploy-1`);
-      }, 3000);
+    if (currentStage >= stages.length) {
+      // 배포 완료 - 모두 성공
+      setIsComplete(true);
+      setDeployStatus("success");
+      setBaseballCommentary("🏆 게임셋! 완봉승! 모든 이닝을 완벽하게 마쳤습니다! 홈런급 배포 성공!");
+      debugLog("Deploy", "Deployment complete - SUCCESS", { projectId });
       return;
     }
 
     const stage = stages[currentStage];
+    const stageStartTime = Date.now();
+    const inning = Math.ceil((currentStage + 1) / 2);
+    const isTop = currentStage % 2 === 0;
+
     debugLog("Deploy", "Stage started", { stage: stage.name });
+
+    // 야구 중계 문구 업데이트
+    setBaseballCommentary(`🎤 ${inning}회 ${isTop ? '초' : '말'}, ${stage.baseball}`);
 
     // 로그 추가
     setLogs((prev) => [...prev, `[${new Date().toLocaleTimeString()}] ⏳ ${stage.name} 시작...`]);
 
     const timer = setTimeout(() => {
-      setLogs((prev) => [...prev, `[${new Date().toLocaleTimeString()}] ✅ ${stage.name} 완료`]);
-      setCurrentStage((prev) => prev + 1);
+      // 실패 확률 체크 (Test 단계에서만)
+      const failed = stage.failChance && Math.random() < stage.failChance;
+      const duration = Math.round((Date.now() - stageStartTime) / 1000);
+
+      if (failed) {
+        // 실패 처리
+        setLogs((prev) => [...prev, `[${new Date().toLocaleTimeString()}] ❌ ${stage.name} 실패`]);
+        setBaseballCommentary(`⚾ 삼진 아웃! ${stage.name}에서 스트라이크 아웃! 경기가 중단되었습니다.`);
+
+        // 현재 단계까지의 결과 저장
+        const results = stages.map((s, index) => {
+          if (index < currentStage) {
+            return { name: s.name, status: "success" as const, duration: Math.round(s.duration / 1000) };
+          } else if (index === currentStage) {
+            return { name: s.name, status: "failed" as const, duration };
+          } else {
+            return { name: s.name, status: "skipped" as const, duration: 0 };
+          }
+        });
+
+        setStageResults(results);
+        setIsComplete(true);
+        setDeployStatus("failed");
+        debugLog("Deploy", "Deployment FAILED", { stage: stage.name });
+      } else {
+        // 성공 처리
+        setLogs((prev) => [...prev, `[${new Date().toLocaleTimeString()}] ✅ ${stage.name} 완료`]);
+
+        // 성공 야구 문구
+        const successComments = [
+          `⚾ 안타! ${stage.name}이(가) 1루에 출루했습니다!`,
+          `🔥 스트라이크! ${stage.name}이(가) 삼진을 잡았습니다!`,
+          `💨 도루 성공! ${stage.name}이(가) 빠르게 진행됩니다!`,
+          `🎯 완벽한 수비! ${stage.name}이(가) 실책 없이 처리했습니다!`
+        ];
+
+        const randomComment = successComments[Math.floor(Math.random() * successComments.length)];
+        setTimeout(() => setBaseballCommentary(randomComment), 500);
+
+        // 결과 업데이트
+        setStageResults((prev) => [
+          ...prev,
+          { name: stage.name, status: "success", duration }
+        ]);
+
+        setCurrentStage((prev) => prev + 1);
+      }
     }, stage.duration);
 
     return () => clearTimeout(timer);
-  }, [currentStage, projectId, router]);
+  }, [currentStage, projectId, deployStatus]);
 
   const progress = ((currentStage / stages.length) * 100).toFixed(0);
+
+  // 배포 완료된 경우 결과 표시
+  if (deployStatus !== null) {
+    const finalResults = deployStatus === "success"
+      ? stages.map(s => ({
+          name: s.name,
+          status: "success" as const,
+          duration: Math.round(s.duration / 1000)
+        }))
+      : stageResults;
+
+    return (
+      <ProtectedRoute>
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50">
+          {/* Navigation */}
+          <nav className="bg-white/80 backdrop-blur-md border-b border-blue-100 sticky top-0 z-50">
+            <div className="container mx-auto px-6 py-4">
+              <Link href="/" className="text-2xl font-bold text-blue-600">
+                Deploy Monitor
+              </Link>
+            </div>
+          </nav>
+
+          <div className="container mx-auto p-8">
+            <DeployResult
+              projectId={projectId}
+              projectName={project?.name || "Project"}
+              branch={project?.branch || "main"}
+              status={deployStatus}
+              duration={Date.now() - startTime}
+              stages={finalResults}
+              onRetry={handleRetry}
+            />
+          </div>
+        </div>
+      </ProtectedRoute>
+    );
+  }
 
   return (
     <ProtectedRoute>
@@ -88,13 +197,22 @@ export default function DeployPage() {
           <Card className="mb-8 bg-gray-900 border-4 border-gray-700">
             {/* 스코어보드 헤더 */}
             <div className="text-center mb-6 pb-4 border-b-2 border-gray-700">
-              <div className="text-yellow-400 text-sm font-bold mb-2">DEPLOYMENT SCOREBOARD</div>
+              <div className="text-yellow-400 text-xs font-bold mb-1">⚾ DEPLOYMENT BASEBALL ⚾</div>
+              <div className="text-yellow-400 text-sm font-bold mb-3">배포 야구장 전광판</div>
+
+              {/* 야구 중계 문구 */}
+              <div className="bg-gray-800 px-6 py-3 rounded-lg mb-4 mx-4">
+                <div className="text-white text-lg font-bold animate-pulse">
+                  {baseballCommentary}
+                </div>
+              </div>
+
               <div className="flex justify-center gap-8 items-center">
                 <Badge variant={isComplete ? "success" : "warning"}>
-                  {isComplete ? "COMPLETE" : "IN PROGRESS"}
+                  {isComplete ? "GAME OVER" : `${Math.ceil((currentStage + 1) / 2)}회 진행중`}
                 </Badge>
                 <div className="text-white font-mono text-lg">
-                  {project?.name} • {project?.branch}
+                  홈팀: {project?.name} • 투수: {project?.branch} branch
                 </div>
               </div>
             </div>
@@ -226,11 +344,6 @@ export default function DeployPage() {
                   {log}
                 </div>
               ))}
-              {isComplete && (
-                <div className="mt-4 text-green-400 font-bold">
-                  🎉 배포 완료! 리포트 페이지로 이동 중...
-                </div>
-              )}
             </div>
           </Card>
         </div>

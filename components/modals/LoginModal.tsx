@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Modal from "@/components/ui/modal";
 import Button from "@/components/ui/button";
-import { useAuth } from "@/contexts/AuthContext";
+import { useMockAuth } from "@/contexts/MockAuthContext";
 import { mockUsers } from "@/lib/mockData";
 import { debugLog } from "@/lib/types";
 
@@ -16,7 +16,7 @@ interface LoginModalProps {
 
 export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
   const router = useRouter();
-  const { login } = useAuth();
+  const { login } = useMockAuth();
   const [selectedUser, setSelectedUser] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 

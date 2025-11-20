@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { MockAuthProvider } from "@/contexts/MockAuthContext";
+import { NextAuthProvider } from "@/components/providers/NextAuthProvider";
 
 const inter = Inter({
   variable: "--font-geist-sans",
@@ -28,7 +30,13 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${jetbrainsMono.variable} antialiased`}
       >
-        <AuthProvider>{children}</AuthProvider>
+        <NextAuthProvider>
+          <AuthProvider>
+            <MockAuthProvider>
+              {children}
+            </MockAuthProvider>
+          </AuthProvider>
+        </NextAuthProvider>
       </body>
     </html>
   );

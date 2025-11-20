@@ -124,13 +124,17 @@ export default function History() {
                   </div>
                 </div>
                 <div className="flex gap-3">
-                  <button className="px-5 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors">
-                    View Details
-                  </button>
-                  {deploy.status === "failed" && (
-                    <button className="px-5 py-2 text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors">
-                      View Error
+                  <Link href={`/history/${deploy.id}`}>
+                    <button className="px-5 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors">
+                      View Details
                     </button>
+                  </Link>
+                  {deploy.status === "failed" && (
+                    <Link href={`/history/${deploy.id}/error`}>
+                      <button className="px-5 py-2 text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors">
+                        View Error
+                      </button>
+                    </Link>
                   )}
                 </div>
               </div>

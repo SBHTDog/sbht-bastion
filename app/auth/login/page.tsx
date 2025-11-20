@@ -2,48 +2,30 @@
 
 // ============================================================================
 // LOGIN PAGE
-// GitHub 로그인 시뮬레이션 페이지 (목 데이터)
-// 디버깅: 명확한 로그인 플로우
+// GitHub OAuth 로그인 페이지 (NextAuth 사용)
 // ============================================================================
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 import Link from "next/link";
-import { useAuth } from "@/contexts/AuthContext";
-import { debugLog } from "@/lib/types";
-import { mockUsers } from "@/lib/mockData";
 
 export default function LoginPage() {
-  const router = useRouter();
-  const { login } = useAuth();
-
-  const [selectedUser, setSelectedUser] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleGitHubLogin = async () => {
     setError("");
-
-    if (!selectedUser) {
-      setError("사용자를 선택해주세요");
-      return;
-    }
-
-    debugLog("LoginPage", "Attempting login", { selectedUser });
     setIsLoading(true);
 
-    // 실제 API 호출 시뮬레이션 (1초 딜레이)
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    const success = await login(selectedUser);
-
-    if (success) {
-      debugLog("LoginPage", "Login successful, redirecting to dashboard");
-      router.push("/dashboard");
-    } else {
-      debugLog("LoginPage", "Login failed");
-      setError("로그인에 실패했습니다");
+    try {
+      // GitHub OAuth로 로그인
+      await signIn("github", {
+        callbackUrl: "/dashboard",
+        redirect: true
+      });
+    } catch (error) {
+      console.error("Login error:", error);
+      setError("로그인 중 오류가 발생했습니다");
       setIsLoading(false);
     }
   };
@@ -72,28 +54,8 @@ export default function LoginPage() {
           </p>
         </div>
 
-        {/* 로그인 폼 */}
-        <form onSubmit={handleLogin} className="space-y-6">
-          {/* 사용자 선택 (목 데이터) */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              테스트 계정 선택 (목 데이터)
-            </label>
-            <select
-              value={selectedUser}
-              onChange={(e) => setSelectedUser(e.target.value)}
-              className="w-full px-4 py-3 bg-white border-2 border-blue-200 rounded-lg text-gray-700 font-medium focus:border-blue-500 focus:outline-none transition-colors"
-              disabled={isLoading}
-            >
-              <option value="">-- 사용자 선택 --</option>
-              {mockUsers.map((user) => (
-                <option key={user.id} value={user.githubUsername}>
-                  {user.name} (@{user.githubUsername})
-                </option>
-              ))}
-            </select>
-          </div>
-
+        {/* 로그인 섹션 */}
+        <div className="space-y-6">
           {/* 에러 메시지 */}
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">
@@ -101,9 +63,9 @@ export default function LoginPage() {
             </div>
           )}
 
-          {/* 로그인 버튼 */}
+          {/* GitHub 로그인 버튼 */}
           <button
-            type="submit"
+            onClick={handleGitHubLogin}
             disabled={isLoading}
             className="w-full blue-gradient text-white font-medium py-3 px-6 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
           >
@@ -121,14 +83,14 @@ export default function LoginPage() {
               </>
             )}
           </button>
-        </form>
 
-        {/* 안내 */}
-        <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-          <p className="text-sm text-blue-800">
-            <strong>ℹ️ 목 데이터 테스트:</strong> 위 계정 중 하나를 선택하여 로그인하세요.
-            실제 GitHub OAuth는 연결되지 않았습니다.
-          </p>
+          {/* 안내 */}
+          <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <p className="text-sm text-blue-800">
+              <strong>ℹ️ 보안 로그인:</strong> GitHub OAuth를 통한 안전한 로그인입니다.
+              GitHub 계정으로 인증하면 자동으로 대시보드로 이동합니다.
+            </p>
+          </div>
         </div>
 
         {/* 홈으로 */}
