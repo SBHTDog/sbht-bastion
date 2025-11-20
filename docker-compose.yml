@@ -1,27 +1,25 @@
-version: '3.8'
-
 services:
   sbht-bastion:
     container_name: sbht-bastion
     image: ghcr.io/sbhtdog/sbht-bastion:latest
     ports:
       - "3000:3000"
-    environment:
-      # Database Configuration
-      DB_HOST: ${DB_HOST}
-      DB_PORT: ${DB_PORT}
-      DB_USERNAME: ${DB_USERNAME}
-      DB_PASSWORD: ${DB_PASSWORD}
-      DB_NAME: ${DB_NAME}
+    # environment:
+    #   # Database Configuration
+    #   DB_HOST: ${DB_HOST}
+    #   DB_PORT: ${DB_PORT}
+    #   DB_USERNAME: ${DB_USERNAME}
+    #   DB_PASSWORD: ${DB_PASSWORD}
+    #   DB_NAME: ${DB_NAME}
       
-      # GitHub App Configuration
-      GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID}
-      GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET}
-      NEXTAUTH_URL: ${NEXTAUTH_URL}
-      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
+    #   # GitHub App Configuration
+    #   GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID}
+    #   GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET}
+    #   NEXTAUTH_URL: ${NEXTAUTH_URL}
+    #   NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
       
-      # Cookie Security Settings
-      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+    #   # Cookie Security Settings
+    #   COOKIE_SECURE: ${COOKIE_SECURE:-false}
     env_file:
       - .env.local
     restart: unless-stopped

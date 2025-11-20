@@ -31,9 +31,8 @@ export async function GET(request: NextRequest) {
       clientSecret: process.env.GITHUB_CLIENT_SECRET!,
     });
 
-    // Create redirect response
-    const redirectUrl = new URL('/dashboard/github', request.nextUrl.origin);
-    const response = NextResponse.redirect(redirectUrl);
+    // Create redirect response (relative path for nginx reverse proxy)
+    const response = NextResponse.redirect(new URL('/dashboard/github', request.url));
 
     // Store token in HttpOnly cookie
     const isSecure = process.env.COOKIE_SECURE !== 'false';

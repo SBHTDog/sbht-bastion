@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
-  const response = NextResponse.redirect(new URL('/dashboard/github', request.nextUrl.origin));
+  const response = NextResponse.redirect(new URL('/dashboard/github', request.url));
 
   // Clear GitHub token cookies
   response.cookies.delete('github_token');
