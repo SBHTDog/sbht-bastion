@@ -31,8 +31,14 @@ export async function GET(request: NextRequest) {
       clientSecret: process.env.GITHUB_CLIENT_SECRET!,
     });
 
-    // Create redirect response (relative path for nginx reverse proxy)
-    const response = NextResponse.redirect(new URL('/dashboard/github', request.url));
+    // Create redirect response
+    // Use PUBLIC_URL env var or X-Forwarded-Host header for reverse proxy support
+    const forwardedHost = request.headers.get('x-forwarded-host');
+    const forwardedProto = request.headers.get('x-forwarded-proto') || 'https';
+    const baseUrl = process.env.PUBLIC_URL || 
+                    (forwardedHost ? `${forwardedProto}://${forwardedHost}` : request.nextUrl.origin);
+    
+    const response = NextResponse.redirect(new URL('/dashboard/github', baseUrl));
 
     // Store token in HttpOnly cookie
     const isSecure = process.env.COOKIE_SECURE !== 'false';
