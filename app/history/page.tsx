@@ -49,7 +49,7 @@ export default function History() {
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <Link href="/" className="text-2xl font-bold text-blue-600">
-              ⚾ Deploy Monitor
+              Deploy Monitor
             </Link>
             <div className="flex gap-6 items-center">
               <Link href="/dashboard" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">

@@ -37,7 +37,7 @@ export default function DeployMonitor() {
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <Link href="/" className="text-2xl font-bold text-blue-600">
-              ⚾ Deploy Monitor
+              Deploy Monitor
             </Link>
             <div className="flex gap-6 items-center">
               <Link href="/dashboard" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">
@@ -57,14 +57,14 @@ export default function DeployMonitor() {
       <div className="container mx-auto p-8">
         {/* Header */}
         <div className="mb-10">
-          <h1 className="text-4xl font-bold mb-3 text-gray-800">⚾ Deploy Monitor</h1>
+          <h1 className="text-4xl font-bold mb-3 text-gray-800">Deployment Pipeline</h1>
           <p className="text-gray-600 text-lg">frontend-app • main branch • v1.2.3</p>
         </div>
 
-        {/* Baseball Scoreboard */}
+        {/* Pipeline Scoreboard */}
         <Card className="mb-8">
           <div className="mb-8">
-            <h2 className="text-3xl font-bold mb-4 text-gray-800">Deployment Progress</h2>
+            <h2 className="text-3xl font-bold mb-4 text-gray-800">Pipeline Progress</h2>
             <div className="flex gap-4 items-center">
               <Badge variant="warning">In Progress</Badge>
               <span className="text-gray-600 font-medium">Stage 4 of 9</span>
