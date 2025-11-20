@@ -9,6 +9,8 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@octokit/auth-oauth-app": "^9.0.3",
+    "@octokit/rest": "^22.0.1",
     "@types/pg": "^8.15.6",
     "next": "16.0.3",
     "pg": "^8.16.3",
