@@ -1,6 +1,8 @@
 import { redirect } from 'next/navigation';
+import Link from 'next/link';
 import { checkAuthentication, fetchGitHubUser, fetchGitHubRepos } from './actions';
 import LogoutButton from './LogoutButton';
+import { Card, Button, Badge } from '@/components/ui';
 
 interface GitHubUser {
   login: string;
@@ -37,19 +39,18 @@ export default async function GitHubDashboardPage() {
 
   if (!authenticated) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full">
-          <h1 className="text-2xl font-bold mb-4">GitHub Dashboard</h1>
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <Card className="max-w-md w-full animate-fadeIn">
+          <h1 className="text-2xl font-bold mb-4 text-gray-800">GitHub Dashboard</h1>
           <p className="text-gray-600 mb-6">
             Connect your GitHub account to view your profile and repositories.
           </p>
-          <a
-            href="/auth/github/login"
-            className="block w-full bg-gray-900 text-white text-center py-3 px-4 rounded-lg hover:bg-gray-800 transition"
-          >
-            Login with GitHub
-          </a>
-        </div>
+          <Link href="/auth/github/login">
+            <Button variant="primary" className="w-full">
+              Login with GitHub
+            </Button>
+          </Link>
+        </Card>
       </div>
     );
   }
@@ -70,62 +71,61 @@ export default async function GitHubDashboardPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md w-full">
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <Card className="max-w-md w-full animate-fadeIn">
           <h2 className="text-red-800 font-bold mb-2">Error</h2>
-          <p className="text-red-600">{error}</p>
-          <a
-            href="/dashboard/github"
-            className="mt-4 inline-block text-red-800 underline"
-          >
-            Try again
-          </a>
-        </div>
+          <p className="text-red-600 mb-4">{error}</p>
+          <Link href="/dashboard/github">
+            <Button variant="danger" size="sm">
+              Try again
+            </Button>
+          </Link>
+        </Card>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <div className="min-h-screen p-4 sm:p-8">
       <div className="max-w-6xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">GitHub Dashboard</h1>
+        <div className="mb-8 animate-fadeIn">
+          <h1 className="text-3xl sm:text-4xl font-bold mb-2 text-gray-800">GitHub Dashboard</h1>
           <p className="text-gray-600">Your GitHub profile and repositories</p>
         </div>
 
         {user && (
-          <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
-            <div className="flex items-start gap-6">
+          <Card className="mb-8 animate-slideUp">
+            <div className="flex flex-col sm:flex-row items-start gap-6">
               <img
                 src={user.avatar_url}
                 alt={user.login}
-                className="w-24 h-24 rounded-full"
+                className="w-24 h-24 rounded-full border-2 border-white/50 shadow-lg"
               />
-              <div className="flex-1">
-                <div className="flex items-center justify-between mb-2">
-                  <h2 className="text-2xl font-bold">
+              <div className="flex-1 w-full">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-2">
+                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-800">
                     {user.name || user.login}
                   </h2>
                   <LogoutButton />
                 </div>
                 <p className="text-gray-600 mb-2">@{user.login}</p>
-                {user.bio && <p className="text-gray-700 mb-4">{user.bio}</p>}
-                
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                  <div>
-                    <div className="text-2xl font-bold">{user.public_repos}</div>
+                {user.bio && <p className="text-gray-700 mb-6">{user.bio}</p>}
+
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                  <div className="text-center sm:text-left">
+                    <div className="text-2xl sm:text-3xl font-bold text-blue-600">{user.public_repos}</div>
                     <div className="text-gray-600 text-sm">Repositories</div>
                   </div>
-                  <div>
-                    <div className="text-2xl font-bold">{user.followers}</div>
+                  <div className="text-center sm:text-left">
+                    <div className="text-2xl sm:text-3xl font-bold text-blue-600">{user.followers}</div>
                     <div className="text-gray-600 text-sm">Followers</div>
                   </div>
-                  <div>
-                    <div className="text-2xl font-bold">{user.following}</div>
+                  <div className="text-center sm:text-left">
+                    <div className="text-2xl sm:text-3xl font-bold text-blue-600">{user.following}</div>
                     <div className="text-gray-600 text-sm">Following</div>
                   </div>
-                  <div>
-                    <div className="text-2xl font-bold">{user.public_gists}</div>
+                  <div className="text-center sm:text-left">
+                    <div className="text-2xl sm:text-3xl font-bold text-blue-600">{user.public_gists}</div>
                     <div className="text-gray-600 text-sm">Gists</div>
                   </div>
                 </div>
@@ -160,37 +160,43 @@ export default async function GitHubDashboardPage() {
                 </div>
               </div>
             </div>
-          </div>
+          </Card>
         )}
 
         {repos.length > 0 && (
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <h2 className="text-xl font-bold mb-4">Recent Repositories</h2>
-            <div className="space-y-4">
+          <Card className="animate-slideUp">
+            <h2 className="text-xl sm:text-2xl font-bold mb-6 text-gray-800">Recent Repositories</h2>
+            <div className="space-y-6">
               {repos.map((repo) => (
-                <div key={repo.id} className="border-b border-gray-200 pb-4 last:border-0">
+                <div key={repo.id} className="border-b border-gray-200/50 pb-6 last:border-0 last:pb-0">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <a
                         href={repo.html_url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-blue-600 hover:underline font-semibold text-lg"
+                        className="text-blue-600 hover:text-blue-700 hover:underline font-semibold text-lg inline-block mb-2"
                       >
                         {repo.name}
                       </a>
                       {repo.description && (
-                        <p className="text-gray-600 mt-1">{repo.description}</p>
+                        <p className="text-gray-600 mb-3 leading-relaxed">{repo.description}</p>
                       )}
-                      <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
+                      <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
                         {repo.language && (
                           <span className="flex items-center gap-1">
                             <span className="w-3 h-3 rounded-full bg-blue-500"></span>
-                            {repo.language}
+                            <span className="font-medium">{repo.language}</span>
                           </span>
                         )}
-                        <span>⭐ {repo.stargazers_count}</span>
-                        <span>🔀 {repo.forks_count}</span>
+                        <span className="flex items-center gap-1">
+                          <span>⭐</span>
+                          <span>{repo.stargazers_count}</span>
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <span>🔀</span>
+                          <span>{repo.forks_count}</span>
+                        </span>
                         {repo.updated_at && (
                           <span>
                             Updated {new Date(repo.updated_at).toLocaleDateString()}
@@ -202,7 +208,7 @@ export default async function GitHubDashboardPage() {
                 </div>
               ))}
             </div>
-          </div>
+          </Card>
         )}
       </div>
     </div>

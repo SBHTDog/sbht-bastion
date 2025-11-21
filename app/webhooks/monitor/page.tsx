@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { Card, Badge } from '@/components/ui';
 
 interface WebhookEvent {
   type: 'connected' | 'webhook' | 'heartbeat';
@@ -92,96 +93,104 @@ export default function WebhookMonitorPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <div className="min-h-screen p-4 sm:p-8">
       <div className="max-w-6xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">GitHub Webhook Monitor</h1>
+        <div className="mb-8 animate-fadeIn">
+          <h1 className="text-3xl sm:text-4xl font-bold mb-2 text-gray-800">GitHub Webhook Monitor</h1>
           <p className="text-gray-600">
             Real-time webhook events via Server-Sent Events (SSE)
           </p>
         </div>
 
         {/* Connection Status */}
-        <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-          <div className="flex items-center justify-between">
+        <Card className="mb-6 animate-slideUp">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <div
                 className={`w-3 h-3 rounded-full ${
                   connected ? 'bg-green-500 animate-pulse' : 'bg-red-500'
                 }`}
               ></div>
-              <span className="font-semibold">
+              <span className="font-semibold text-gray-800">
                 {connected ? 'Connected' : 'Disconnected'}
               </span>
+              {connected && (
+                <Badge variant="success" className="text-xs">
+                  Live
+                </Badge>
+              )}
             </div>
             <div className="text-sm text-gray-600">
-              {events.length} events received
+              <span className="font-semibold text-blue-600">{events.length}</span> events received
             </div>
           </div>
           {error && (
-            <div className="mt-3 text-sm text-red-600">{error}</div>
+            <div className="mt-3 text-sm text-red-600 flex items-center gap-2">
+              <span>⚠️</span>
+              <span>{error}</span>
+            </div>
           )}
-        </div>
+        </Card>
 
         {/* Webhook Endpoint Info */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-          <h3 className="font-semibold mb-2">Webhook Endpoint:</h3>
-          <code className="bg-white px-3 py-2 rounded border border-blue-300 text-sm block">
+        <Card className="mb-6 bg-blue-50/50 animate-slideUp">
+          <h3 className="font-semibold mb-3 text-gray-800">Webhook Endpoint</h3>
+          <code className="bg-white/80 backdrop-blur-sm px-4 py-3 rounded-lg border border-blue-200 text-sm block font-mono text-gray-700">
             POST http://localhost:3000/api/webhooks/github
           </code>
-          <p className="text-sm text-gray-600 mt-2">
+          <p className="text-sm text-gray-600 mt-3 leading-relaxed">
             Send a POST request to this endpoint to see events appear in real-time
           </p>
-        </div>
+        </Card>
 
         {/* Events List */}
-        <div className="bg-white rounded-lg shadow-lg p-6">
-          <h2 className="text-xl font-bold mb-4">Event Stream</h2>
-          
+        <Card className="animate-slideUp">
+          <h2 className="text-xl sm:text-2xl font-bold mb-6 text-gray-800">Event Stream</h2>
+
           {events.length === 0 ? (
-            <div className="text-center py-12 text-gray-500">
-              <div className="text-4xl mb-2">👀</div>
-              <p>Waiting for webhook events...</p>
-              <p className="text-sm mt-1">Events will appear here in real-time</p>
+            <div className="text-center py-16 text-gray-500">
+              <div className="text-5xl mb-3">👀</div>
+              <p className="font-medium text-lg">Waiting for webhook events...</p>
+              <p className="text-sm mt-2">Events will appear here in real-time</p>
             </div>
           ) : (
-            <div className="space-y-3 max-h-[600px] overflow-y-auto">
+            <div className="space-y-3 max-h-[600px] overflow-y-auto pr-2 scrollbar-thin">
               {events.map((event, index) => (
                 <div
                   key={index}
-                  className={`border rounded-lg p-4 ${getEventColor(event.type)}`}
+                  className={`border rounded-lg p-4 transition-all hover:shadow-md ${getEventColor(event.type)}`}
                 >
-                  <div className="flex items-start justify-between mb-2">
-                    <div className="flex items-center gap-2">
+                  <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2 sm:gap-4 mb-2">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <span className="text-xl">{getEventIcon(event.type)}</span>
                       <span className="font-semibold capitalize">{event.type}</span>
                       {event.type === 'webhook' && event.data?.event && (
-                        <span className="text-sm bg-white px-2 py-1 rounded">
+                        <Badge variant="default" className="text-xs">
                           {event.data.event}
-                        </span>
+                        </Badge>
                       )}
                     </div>
-                    <span className="text-xs opacity-75">
+                    <span className="text-xs opacity-75 whitespace-nowrap">
                       {new Date(event.timestamp).toLocaleTimeString()}
                     </span>
                   </div>
 
                   {event.message && (
-                    <p className="text-sm mb-2">{event.message}</p>
+                    <p className="text-sm mb-2 leading-relaxed">{event.message}</p>
                   )}
 
                   {event.type === 'heartbeat' && event.listeners !== undefined && (
                     <p className="text-sm">
-                      Active listeners: {event.listeners}
+                      Active listeners: <span className="font-semibold">{event.listeners}</span>
                     </p>
                   )}
 
                   {event.type === 'webhook' && event.data && (
-                    <details className="mt-2">
-                      <summary className="cursor-pointer text-sm font-medium mb-2">
-                        View Payload
+                    <details className="mt-3">
+                      <summary className="cursor-pointer text-sm font-medium mb-2 hover:text-blue-600 transition-colors">
+                        View Payload →
                       </summary>
-                      <pre className="bg-white rounded p-3 text-xs overflow-x-auto border">
+                      <pre className="bg-white/80 backdrop-blur-sm rounded-lg p-4 text-xs overflow-x-auto border border-gray-200 font-mono">
                         {JSON.stringify(event.data, null, 2)}
                       </pre>
                     </details>
@@ -190,18 +199,18 @@ export default function WebhookMonitorPage() {
               ))}
             </div>
           )}
-        </div>
+        </Card>
 
         {/* Test Section */}
-        <div className="mt-6 bg-white rounded-lg shadow-lg p-6">
-          <h3 className="font-semibold mb-3">Test with curl:</h3>
-          <pre className="bg-gray-800 text-green-400 p-4 rounded text-sm overflow-x-auto">
+        <Card className="mt-6 animate-slideUp">
+          <h3 className="font-semibold mb-4 text-gray-800">Test with curl</h3>
+          <pre className="bg-gray-800 text-green-400 p-4 rounded-lg text-sm overflow-x-auto font-mono">
             {`curl -X POST http://localhost:3000/api/webhooks/github \\
   -H "Content-Type: application/json" \\
   -H "X-GitHub-Event: push" \\
   -d '{"test": "webhook", "message": "Hello from curl!"}'`}
           </pre>
-        </div>
+        </Card>
       </div>
     </div>
   );

@@ -1,15 +1,72 @@
 @import "tailwindcss";
 
+/* =================================
+   Deploy Monitor Design System
+   Based on docs/design-system/
+   ================================= */
+
 :root {
+  /* Original variables (preserved) */
   --background: #ffffff;
   --foreground: #171717;
+
+  /* Primary Colors */
+  --primary-blue: #4a90e2;
+  --primary-blue-light: #6bb6ff;
+  --primary-blue-dark: #2e5f8f;
+
+  /* Neutral Colors */
+  --bg-white: #ffffff;
+  --bg-light: #f8fafc;
+  --bg-gray: #f1f5f9;
+
+  /* Text Colors */
+  --text-dark: #1e293b;
+  --text-gray: #64748b;
+  --text-light: #94a3b8;
+
+  /* Semantic Colors */
+  --success: #10b981;
+  --error: #ef4444;
+  --warning: #f59e0b;
+  --info: #3b82f6;
+
+  /* Code Colors */
+  --code-bg: #0f172a;
+  --code-text: #e2e8f0;
+
+  /* Glassmorphism Variables */
+  --glass-bg-light: rgba(255, 255, 255, 0.25);
+  --glass-bg-heavy: rgba(255, 255, 255, 0.95);
+  --glass-bg-navbar: rgba(255, 255, 255, 0.9);
+  --glass-blur-light: 10px;
+  --glass-blur-heavy: 20px;
+  --glass-blur-navbar: 8px;
+  --glass-border-light: rgba(255, 255, 255, 0.18);
+  --glass-border-heavy: rgba(255, 255, 255, 0.6);
 }
 
 @theme inline {
+  /* Original theme (preserved) */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* Design System Colors */
+  --color-primary-blue*: var(--primary-blue);
+  --color-success*: var(--success);
+  --color-error*: var(--error);
+  --color-warning*: var(--warning);
+  --color-info*: var(--info);
+
+  /* Text Colors */
+  --color-text-dark*: var(--text-dark);
+  --color-text-gray*: var(--text-gray);
+
+  /* Background Colors */
+  --color-bg-light*: var(--bg-light);
+  --color-bg-gray*: var(--bg-gray);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -23,4 +80,123 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* =================================
+   Glassmorphism Utility Classes
+   Based on docs/design-system/glassmorphism.css
+   ================================= */
+
+/* Light Glass (Default) - For Cards */
+.glass {
+  background: var(--glass-bg-light);
+  backdrop-filter: blur(var(--glass-blur-light));
+  -webkit-backdrop-filter: blur(var(--glass-blur-light));
+  border-radius: 16px;
+  border: 1px solid var(--glass-border-light);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+/* Heavy Glass - For Modals */
+.glass-modal {
+  background: linear-gradient(
+    135deg,
+    var(--glass-bg-heavy) 0%,
+    rgba(255, 255, 255, 0.9) 100%
+  );
+  backdrop-filter: blur(var(--glass-blur-heavy)) saturate(150%);
+  -webkit-backdrop-filter: blur(var(--glass-blur-heavy)) saturate(150%);
+  border-radius: 24px;
+  border: 1px solid var(--glass-border-heavy);
+  box-shadow: 0 20px 60px 0 rgba(0, 0, 0, 0.15);
+  padding: 2rem;
+}
+
+/* Navbar Glass */
+.glass-navbar {
+  background: var(--glass-bg-navbar);
+  backdrop-filter: blur(var(--glass-blur-navbar));
+  -webkit-backdrop-filter: blur(var(--glass-blur-navbar));
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Glass Backdrop (for modal overlays) */
+.glass-backdrop {
+  background: linear-gradient(
+    135deg,
+    rgba(74, 144, 226, 0.3) 0%,
+    rgba(139, 92, 246, 0.2) 50%,
+    rgba(74, 144, 226, 0.3) 100%
+  );
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Dev Minimal Style (for code blocks) */
+.dev-minimal {
+  background: var(--code-bg);
+  color: var(--code-text);
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  border-radius: 8px;
+  padding: 1rem;
+  overflow-x: auto;
+}
+
+/* Fallback for browsers without backdrop-filter support */
+@supports not (backdrop-filter: blur(1px)) {
+  .glass,
+  .glass-modal,
+  .glass-navbar {
+    background: rgba(255, 255, 255, 0.95);
+  }
+}
+
+/* =================================
+   Animations
+   ================================= */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes blob {
+  0%,
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.2s ease-out;
+}
+
+.animate-slideUp {
+  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.animate-blob {
+  animation: blob 7s infinite;
 }

@@ -1,0 +1,549 @@
+{
+  "$schema": "https://design-tokens.github.io/community-group/format/schema.json",
+  "name": "Deploy Monitor Design System",
+  "version": "1.0.0",
+  "description": "Reusable design tokens for Deploy Monitor UI/UX system",
+
+  "colors": {
+    "primary": {
+      "blue": {
+        "$type": "color",
+        "$value": "#4a90e2",
+        "$description": "Primary brand color"
+      },
+      "blue-light": {
+        "$type": "color",
+        "$value": "#6bb6ff",
+        "$description": "Light variant of primary blue"
+      },
+      "blue-dark": {
+        "$type": "color",
+        "$value": "#2e5f8f",
+        "$description": "Dark variant of primary blue"
+      }
+    },
+
+    "neutral": {
+      "white": {
+        "$type": "color",
+        "$value": "#ffffff",
+        "$description": "Pure white"
+      },
+      "bg-light": {
+        "$type": "color",
+        "$value": "#f8fafc",
+        "$description": "Light background"
+      },
+      "bg-gray": {
+        "$type": "color",
+        "$value": "#f1f5f9",
+        "$description": "Gray background"
+      },
+      "gray-50": {
+        "$type": "color",
+        "$value": "#f9fafb"
+      },
+      "gray-100": {
+        "$type": "color",
+        "$value": "#f3f4f6"
+      },
+      "gray-200": {
+        "$type": "color",
+        "$value": "#e5e7eb"
+      },
+      "gray-300": {
+        "$type": "color",
+        "$value": "#d1d5db"
+      },
+      "gray-400": {
+        "$type": "color",
+        "$value": "#9ca3af"
+      },
+      "gray-500": {
+        "$type": "color",
+        "$value": "#6b7280"
+      },
+      "gray-600": {
+        "$type": "color",
+        "$value": "#4b5563"
+      },
+      "gray-700": {
+        "$type": "color",
+        "$value": "#374151"
+      },
+      "gray-800": {
+        "$type": "color",
+        "$value": "#1f2937"
+      },
+      "gray-900": {
+        "$type": "color",
+        "$value": "#111827"
+      }
+    },
+
+    "text": {
+      "dark": {
+        "$type": "color",
+        "$value": "#1e293b",
+        "$description": "Primary text color"
+      },
+      "gray": {
+        "$type": "color",
+        "$value": "#64748b",
+        "$description": "Secondary text color"
+      },
+      "light": {
+        "$type": "color",
+        "$value": "#94a3b8",
+        "$description": "Tertiary text color"
+      }
+    },
+
+    "semantic": {
+      "success": {
+        "$type": "color",
+        "$value": "#10b981",
+        "$description": "Success state color"
+      },
+      "error": {
+        "$type": "color",
+        "$value": "#ef4444",
+        "$description": "Error state color"
+      },
+      "warning": {
+        "$type": "color",
+        "$value": "#f59e0b",
+        "$description": "Warning state color"
+      },
+      "info": {
+        "$type": "color",
+        "$value": "#3b82f6",
+        "$description": "Info state color"
+      }
+    },
+
+    "code": {
+      "bg": {
+        "$type": "color",
+        "$value": "#0f172a",
+        "$description": "Code block background"
+      },
+      "text": {
+        "$type": "color",
+        "$value": "#e2e8f0",
+        "$description": "Code block text"
+      }
+    }
+  },
+
+  "typography": {
+    "fontFamily": {
+      "sans": {
+        "$type": "fontFamily",
+        "$value": ["Inter", "-apple-system", "BlinkMacSystemFont", "sans-serif"],
+        "$description": "Sans-serif font stack"
+      },
+      "mono": {
+        "$type": "fontFamily",
+        "$value": ["JetBrains Mono", "Fira Code", "monospace"],
+        "$description": "Monospace font stack"
+      }
+    },
+
+    "fontSize": {
+      "xs": {
+        "$type": "dimension",
+        "$value": "0.75rem",
+        "$description": "12px - Captions, labels"
+      },
+      "sm": {
+        "$type": "dimension",
+        "$value": "0.875rem",
+        "$description": "14px - Body text, buttons"
+      },
+      "base": {
+        "$type": "dimension",
+        "$value": "1rem",
+        "$description": "16px - Default body"
+      },
+      "lg": {
+        "$type": "dimension",
+        "$value": "1.125rem",
+        "$description": "18px - Subtitles"
+      },
+      "xl": {
+        "$type": "dimension",
+        "$value": "1.25rem",
+        "$description": "20px - Section headers"
+      },
+      "2xl": {
+        "$type": "dimension",
+        "$value": "1.5rem",
+        "$description": "24px - Page titles"
+      },
+      "3xl": {
+        "$type": "dimension",
+        "$value": "1.875rem",
+        "$description": "30px - Large titles"
+      },
+      "4xl": {
+        "$type": "dimension",
+        "$value": "2.25rem",
+        "$description": "36px - Hero headings"
+      },
+      "5xl": {
+        "$type": "dimension",
+        "$value": "3rem",
+        "$description": "48px - Display headings"
+      }
+    },
+
+    "fontWeight": {
+      "normal": {
+        "$type": "number",
+        "$value": 400,
+        "$description": "Regular weight"
+      },
+      "medium": {
+        "$type": "number",
+        "$value": 500,
+        "$description": "Medium weight"
+      },
+      "semibold": {
+        "$type": "number",
+        "$value": 600,
+        "$description": "Semibold weight"
+      },
+      "bold": {
+        "$type": "number",
+        "$value": 700,
+        "$description": "Bold weight"
+      }
+    },
+
+    "lineHeight": {
+      "tight": {
+        "$type": "number",
+        "$value": 1.25,
+        "$description": "Tight line height"
+      },
+      "normal": {
+        "$type": "number",
+        "$value": 1.5,
+        "$description": "Normal line height"
+      },
+      "relaxed": {
+        "$type": "number",
+        "$value": 1.75,
+        "$description": "Relaxed line height"
+      }
+    }
+  },
+
+  "spacing": {
+    "0": {
+      "$type": "dimension",
+      "$value": "0px"
+    },
+    "0.5": {
+      "$type": "dimension",
+      "$value": "0.125rem",
+      "$description": "2px - Borders, dividers"
+    },
+    "1": {
+      "$type": "dimension",
+      "$value": "0.25rem",
+      "$description": "4px - Tight spacing"
+    },
+    "2": {
+      "$type": "dimension",
+      "$value": "0.5rem",
+      "$description": "8px - Component padding"
+    },
+    "3": {
+      "$type": "dimension",
+      "$value": "0.75rem",
+      "$description": "12px - Small gaps"
+    },
+    "4": {
+      "$type": "dimension",
+      "$value": "1rem",
+      "$description": "16px - Default spacing"
+    },
+    "6": {
+      "$type": "dimension",
+      "$value": "1.5rem",
+      "$description": "24px - Medium gaps"
+    },
+    "8": {
+      "$type": "dimension",
+      "$value": "2rem",
+      "$description": "32px - Large gaps"
+    },
+    "12": {
+      "$type": "dimension",
+      "$value": "3rem",
+      "$description": "48px - Section spacing"
+    },
+    "16": {
+      "$type": "dimension",
+      "$value": "4rem",
+      "$description": "64px - Hero spacing"
+    },
+    "20": {
+      "$type": "dimension",
+      "$value": "5rem",
+      "$description": "80px - Extra large spacing"
+    },
+    "24": {
+      "$type": "dimension",
+      "$value": "6rem",
+      "$description": "96px - Maximum spacing"
+    }
+  },
+
+  "borderRadius": {
+    "none": {
+      "$type": "dimension",
+      "$value": "0px"
+    },
+    "sm": {
+      "$type": "dimension",
+      "$value": "0.25rem",
+      "$description": "4px - Small radius"
+    },
+    "base": {
+      "$type": "dimension",
+      "$value": "0.5rem",
+      "$description": "8px - Default radius"
+    },
+    "md": {
+      "$type": "dimension",
+      "$value": "0.75rem",
+      "$description": "12px - Medium radius"
+    },
+    "lg": {
+      "$type": "dimension",
+      "$value": "1rem",
+      "$description": "16px - Large radius"
+    },
+    "xl": {
+      "$type": "dimension",
+      "$value": "1.5rem",
+      "$description": "24px - Extra large radius"
+    },
+    "full": {
+      "$type": "dimension",
+      "$value": "9999px",
+      "$description": "Full circle"
+    }
+  },
+
+  "shadows": {
+    "sm": {
+      "$type": "shadow",
+      "$value": {
+        "offsetX": "0px",
+        "offsetY": "1px",
+        "blur": "2px",
+        "spread": "0px",
+        "color": "rgba(0, 0, 0, 0.05)"
+      },
+      "$description": "Small shadow"
+    },
+    "base": {
+      "$type": "shadow",
+      "$value": {
+        "offsetX": "0px",
+        "offsetY": "1px",
+        "blur": "3px",
+        "spread": "0px",
+        "color": "rgba(0, 0, 0, 0.1)"
+      },
+      "$description": "Default shadow"
+    },
+    "md": {
+      "$type": "shadow",
+      "$value": {
+        "offsetX": "0px",
+        "offsetY": "4px",
+        "blur": "6px",
+        "spread": "-1px",
+        "color": "rgba(0, 0, 0, 0.1)"
+      },
+      "$description": "Medium shadow"
+    },
+    "lg": {
+      "$type": "shadow",
+      "$value": {
+        "offsetX": "0px",
+        "offsetY": "10px",
+        "blur": "15px",
+        "spread": "-3px",
+        "color": "rgba(0, 0, 0, 0.1)"
+      },
+      "$description": "Large shadow"
+    },
+    "glass": {
+      "$type": "shadow",
+      "$value": {
+        "offsetX": "0px",
+        "offsetY": "8px",
+        "blur": "32px",
+        "spread": "0px",
+        "color": "rgba(74, 144, 226, 0.1)"
+      },
+      "$description": "Glassmorphism shadow"
+    }
+  },
+
+  "breakpoints": {
+    "sm": {
+      "$type": "dimension",
+      "$value": "640px",
+      "$description": "Tablet breakpoint"
+    },
+    "md": {
+      "$type": "dimension",
+      "$value": "768px",
+      "$description": "Desktop breakpoint"
+    },
+    "lg": {
+      "$type": "dimension",
+      "$value": "1024px",
+      "$description": "Large desktop breakpoint"
+    },
+    "xl": {
+      "$type": "dimension",
+      "$value": "1280px",
+      "$description": "Extra large breakpoint"
+    }
+  },
+
+  "animation": {
+    "duration": {
+      "fast": {
+        "$type": "duration",
+        "$value": "150ms",
+        "$description": "Fast animation"
+      },
+      "base": {
+        "$type": "duration",
+        "$value": "200ms",
+        "$description": "Default animation"
+      },
+      "slow": {
+        "$type": "duration",
+        "$value": "300ms",
+        "$description": "Slow animation"
+      }
+    },
+
+    "easing": {
+      "linear": {
+        "$type": "cubicBezier",
+        "$value": [0, 0, 1, 1],
+        "$description": "Linear easing"
+      },
+      "ease-out": {
+        "$type": "cubicBezier",
+        "$value": [0, 0, 0.2, 1],
+        "$description": "Ease out"
+      },
+      "ease-in-out": {
+        "$type": "cubicBezier",
+        "$value": [0.4, 0, 0.2, 1],
+        "$description": "Ease in-out"
+      },
+      "spring": {
+        "$type": "cubicBezier",
+        "$value": [0.16, 1, 0.3, 1],
+        "$description": "Spring easing"
+      }
+    }
+  },
+
+  "glass": {
+    "light": {
+      "background": {
+        "$type": "color",
+        "$value": "rgba(255, 255, 255, 0.25)",
+        "$description": "Light glass background"
+      },
+      "blur": {
+        "$type": "dimension",
+        "$value": "10px",
+        "$description": "Light glass blur"
+      },
+      "border": {
+        "$type": "color",
+        "$value": "rgba(255, 255, 255, 0.18)",
+        "$description": "Light glass border"
+      }
+    },
+
+    "heavy": {
+      "background": {
+        "$type": "color",
+        "$value": "rgba(255, 255, 255, 0.95)",
+        "$description": "Heavy glass background"
+      },
+      "blur": {
+        "$type": "dimension",
+        "$value": "20px",
+        "$description": "Heavy glass blur"
+      },
+      "border": {
+        "$type": "color",
+        "$value": "rgba(255, 255, 255, 0.6)",
+        "$description": "Heavy glass border"
+      }
+    },
+
+    "navbar": {
+      "background": {
+        "$type": "color",
+        "$value": "rgba(255, 255, 255, 0.9)",
+        "$description": "Navigation bar glass background"
+      },
+      "blur": {
+        "$type": "dimension",
+        "$value": "8px",
+        "$description": "Navigation bar glass blur"
+      }
+    }
+  },
+
+  "zIndex": {
+    "base": {
+      "$type": "number",
+      "$value": 0,
+      "$description": "Base z-index"
+    },
+    "content": {
+      "$type": "number",
+      "$value": 10,
+      "$description": "Content layer"
+    },
+    "floating": {
+      "$type": "number",
+      "$value": 20,
+      "$description": "Floating elements"
+    },
+    "dropdown": {
+      "$type": "number",
+      "$value": 30,
+      "$description": "Dropdowns"
+    },
+    "sticky": {
+      "$type": "number",
+      "$value": 40,
+      "$description": "Sticky headers"
+    },
+    "modal": {
+      "$type": "number",
+      "$value": 50,
+      "$description": "Modal dialogs"
+    }
+  }
+}

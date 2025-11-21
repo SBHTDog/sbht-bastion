@@ -1,12 +1,13 @@
 'use client';
 
+import { Button } from '@/components/ui';
+
 export default function LogoutButton() {
   return (
-    <a
-      href="/auth/github/logout"
-      className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition text-sm"
-    >
-      Logout
+    <a href="/auth/github/logout">
+      <Button variant="danger" size="sm">
+        Logout
+      </Button>
     </a>
   );
 }
