@@ -1,6 +1,6 @@
 "use client";
 
-// 온보딩 - GitHub 레포지토리 선택
+// Onboarding - GitHub Repository Selection
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -19,7 +19,7 @@ export default function OnboardingPage() {
 
   const handleSelectRepo = () => {
     if (!selectedRepo) {
-      alert("레포지토리를 선택해주세요");
+      alert("Please select a repository");
       return;
     }
 
@@ -40,24 +40,24 @@ export default function OnboardingPage() {
         </nav>
 
         <div className="container mx-auto p-8 max-w-4xl">
-          {/* 헤더 */}
+          {/* Header */}
           <div className="mb-10">
-            <h1 className="text-4xl font-bold mb-2 text-gray-800">레포지토리 선택</h1>
-            <p className="text-gray-600 text-lg">배포할 GitHub 레포지토리를 선택하세요</p>
+            <h1 className="text-4xl font-bold mb-2 text-gray-800">Select Repository</h1>
+            <p className="text-gray-600 text-lg">Choose a GitHub repository to deploy</p>
           </div>
 
-          {/* 검색 */}
+          {/* Search */}
           <Card className="mb-8">
             <input
               type="text"
-              placeholder="레포지토리 검색..."
+              placeholder="Search repository..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full px-4 py-3 bg-white border-2 border-blue-200 rounded-lg text-gray-700 font-medium focus:border-blue-500 focus:outline-none"
             />
           </Card>
 
-          {/* 레포 목록 */}
+          {/* Repository List */}
           <div className="space-y-4 mb-8">
             {filteredRepos.map((repo) => (
               <Card
@@ -87,13 +87,13 @@ export default function OnboardingPage() {
             ))}
           </div>
 
-          {/* 액션 버튼 */}
+          {/* Action Buttons */}
           <div className="flex gap-4">
             <Link href="/dashboard">
-              <Button variant="ghost">← 취소</Button>
+              <Button variant="ghost">← Cancel</Button>
             </Link>
             <Button onClick={handleSelectRepo} disabled={!selectedRepo}>
-              다음 →
+              Next →
             </Button>
           </div>
         </div>

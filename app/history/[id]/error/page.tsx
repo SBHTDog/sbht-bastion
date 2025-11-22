@@ -18,7 +18,7 @@ export default function HistoryErrorPage() {
   const mockAuth = useMockAuth();
   const user = mockAuth.isAuthenticated ? mockAuth.user : auth.user;
 
-  // 목데이터 - 실패한 배포 정보
+  // Mock data - Failed deployment information
   const failedDeployment = {
     id: deploymentId,
     version: "v1.2.3",
@@ -26,15 +26,15 @@ export default function HistoryErrorPage() {
     projectId: "project-1",
     branch: "main",
     status: "failed",
-    deployedAt: new Date(Date.now() - 3600000).toISOString(), // 1시간 전
+    deployedAt: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
     deployedBy: user?.name || "Unknown",
     failedStage: "Test",
-    failureTime: new Date(Date.now() - 3000000).toISOString(), // 50분 전
+    failureTime: new Date(Date.now() - 3000000).toISOString(), // 50 minutes ago
     commitHash: "abc123def456",
     commitMessage: "feat: Add new deployment monitoring features"
   };
 
-  // 실패 단계 정보
+  // Failed stage information
   const stageInfo = {
     stage: failedDeployment.failedStage,
     stageNumber: 4,
@@ -44,20 +44,20 @@ export default function HistoryErrorPage() {
     timestamp: failedDeployment.failureTime
   };
 
-  // LLM 분석 결과
+  // LLM analysis results
   const llmAnalysis = {
-    summary: `배포가 ${stageInfo.stage} 단계에서 실패했습니다. 단위 테스트 중 2개의 테스트 스위트가 실패했으며, 주요 원인은 Header 컴포넌트의 props 타입 불일치와 환경 변수 미설정으로 분석됩니다.`,
+    summary: `Deployment failed at the ${stageInfo.stage} stage. 2 test suites failed during unit testing, with the main causes identified as Header component props type mismatch and missing environment variables.`,
 
     rootCause: [
       {
-        title: "테스트 환경 설정 오류",
-        description: "Header.test.tsx에서 예상하는 'Deploy Monitor' 타이틀이 실제로는 'Deploy Monitor Beta'로 렌더링되고 있습니다.",
+        title: "Test Environment Configuration Error",
+        description: "Header.test.tsx expects 'Deploy Monitor' title but it's actually rendered as 'Deploy Monitor Beta'.",
         severity: "high",
         code: `Expected: "Deploy Monitor"\nReceived: "Deploy Monitor Beta"`
       },
       {
-        title: "환경 변수 누락",
-        description: "테스트 환경에서 NEXT_PUBLIC_APP_TITLE 환경 변수가 설정되지 않아 undefined 에러가 발생했습니다.",
+        title: "Missing Environment Variables",
+        description: "The NEXT_PUBLIC_APP_TITLE environment variable is not set in the test environment, causing an undefined error.",
         severity: "medium",
         code: `Cannot read property 'user' of undefined\nat Header.test.tsx:45`
       }
@@ -65,67 +65,67 @@ export default function HistoryErrorPage() {
 
     suggestions: [
       {
-        priority: "높음",
-        action: "테스트 케이스 업데이트",
-        description: "Header.test.tsx의 기대값을 현재 구현과 일치하도록 수정하세요.",
+        priority: "High",
+        action: "Update Test Cases",
+        description: "Modify the expected values in Header.test.tsx to match the current implementation.",
         command: `jest.mock('@/config', () => ({
   APP_TITLE: 'Deploy Monitor Beta'
 }))`
       },
       {
-        priority: "중간",
-        action: "환경 변수 설정",
-        description: ".env.test 파일에 필요한 환경 변수를 추가하세요.",
+        priority: "Medium",
+        action: "Set Environment Variables",
+        description: "Add required environment variables to .env.test file.",
         command: `NEXT_PUBLIC_APP_TITLE="Deploy Monitor Beta"
 NEXT_PUBLIC_API_URL="http://localhost:3000"`
       },
       {
-        priority: "낮음",
-        action: "의존성 버전 확인",
-        description: "@testing-library/react 버전과 React 버전 호환성을 확인하세요.",
+        priority: "Low",
+        action: "Check Dependency Versions",
+        description: "Verify compatibility between @testing-library/react and React versions.",
         command: "npm list @testing-library/react react"
       }
     ],
 
-    confidence: 92 // AI 분석 신뢰도
+    confidence: 92 // AI analysis confidence
   };
 
-  // 취약점 요약
+  // Vulnerability summary
   const vulnerabilities = {
-    summary: "보안 스캔에서 2개의 HIGH, 5개의 MEDIUM 취약점이 발견되었습니다.",
+    summary: "Security scan found 2 HIGH and 5 MEDIUM vulnerabilities.",
     high: [
       {
         cve: "CVE-2023-44487",
         package: "axios@0.21.1",
-        description: "HTTP/2 Rapid Reset Attack - DoS 취약점",
+        description: "HTTP/2 Rapid Reset Attack - DoS vulnerability",
         fixVersion: "1.6.0",
-        impact: "서비스 거부 공격 가능"
+        impact: "Denial of service attack possible"
       },
       {
         cve: "CVE-2023-45857",
         package: "lodash@4.17.19",
-        description: "Prototype Pollution - 코드 실행 취약점",
+        description: "Prototype Pollution - Code execution vulnerability",
         fixVersion: "4.17.21",
-        impact: "원격 코드 실행 가능"
+        impact: "Remote code execution possible"
       }
     ],
     medium: [
       {
         cve: "CVE-2023-26159",
         package: "follow-redirects@1.14.0",
-        description: "입력 검증 미흡",
+        description: "Improper Input Validation",
         fixVersion: "1.15.4"
       },
       {
         cve: "CVE-2023-28155",
         package: "request@2.88.0",
-        description: "SSRF 취약점",
+        description: "SSRF vulnerability",
         fixVersion: "deprecated"
       },
       {
         cve: "CVE-2023-26136",
         package: "tough-cookie@2.5.0",
-        description: "정규식 DoS",
+        description: "Regular Expression DoS",
         fixVersion: "4.1.3"
       }
     ],
@@ -133,7 +133,7 @@ NEXT_PUBLIC_API_URL="http://localhost:3000"`
     low: 12
   };
 
-  // 에러 로그
+  // Error logs
   const errorLogs = [
     { time: "14:24:48", level: "INFO", message: "Running test suites..." },
     { time: "14:25:03", level: "ERROR", message: "FAIL src/components/Header.test.tsx" },
@@ -176,40 +176,40 @@ NEXT_PUBLIC_API_URL="http://localhost:3000"`
           <div className="mb-8">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-4">
-                <h1 className="text-4xl font-bold text-gray-800">배포 실패 분석</h1>
+                <h1 className="text-4xl font-bold text-gray-800">Deployment Failure Analysis</h1>
                 <Badge variant="error">Failed</Badge>
               </div>
               <Link href="/history">
-                <Button variant="secondary">← 목록으로</Button>
+                <Button variant="secondary">← Back to list</Button>
               </Link>
             </div>
 
-            {/* 기본 정보 */}
+            {/* Basic Information */}
             <div className="grid grid-cols-4 gap-4">
               <div>
-                <span className="text-gray-500 text-sm">버전</span>
+                <span className="text-gray-500 text-sm">Version</span>
                 <p className="text-lg font-bold text-gray-800">{failedDeployment.version}</p>
               </div>
               <div>
-                <span className="text-gray-500 text-sm">프로젝트</span>
+                <span className="text-gray-500 text-sm">Project</span>
                 <p className="text-lg font-bold text-gray-800">{failedDeployment.projectName}</p>
               </div>
               <div>
-                <span className="text-gray-500 text-sm">브랜치</span>
+                <span className="text-gray-500 text-sm">Branch</span>
                 <p className="text-lg font-bold text-gray-800">{failedDeployment.branch}</p>
               </div>
               <div>
-                <span className="text-gray-500 text-sm">실패 시간</span>
+                <span className="text-gray-500 text-sm">Failure Time</span>
                 <p className="text-lg font-bold text-red-600">
-                  {new Date(failedDeployment.failureTime).toLocaleTimeString()}
+                  {new Date(failedDeployment.failureTime).toLocaleTimeString('en-US')}
                 </p>
               </div>
             </div>
           </div>
 
-          {/* 실패 단계 정보 */}
+          {/* Failed Stage Information */}
           <Card className="mb-8 border-2 border-red-300 bg-red-50">
-            <h2 className="text-2xl font-bold mb-6 text-red-700">❌ 실패 단계</h2>
+            <h2 className="text-2xl font-bold mb-6 text-red-700">❌ Failed Stage</h2>
 
             <div className="bg-white p-6 rounded-lg">
               <div className="flex items-center justify-between mb-4">
@@ -219,16 +219,16 @@ NEXT_PUBLIC_API_URL="http://localhost:3000"`
                   </div>
                   <div>
                     <h3 className="text-2xl font-bold text-gray-800">{stageInfo.stage}</h3>
-                    <p className="text-gray-600">단계 {stageInfo.stageNumber} / {stageInfo.totalStages}</p>
+                    <p className="text-gray-600">Stage {stageInfo.stageNumber} / {stageInfo.totalStages}</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="text-sm text-gray-500">에러 코드</div>
+                  <div className="text-sm text-gray-500">Error Code</div>
                   <div className="text-lg font-mono font-bold text-red-600">{stageInfo.errorCode}</div>
                 </div>
               </div>
 
-              {/* 진행 바 */}
+              {/* Progress Bar */}
               <div className="w-full bg-gray-200 rounded-full h-3 mb-4">
                 <div
                   className="bg-gradient-to-r from-green-500 via-yellow-500 to-red-500 h-3 rounded-full"
@@ -237,26 +237,26 @@ NEXT_PUBLIC_API_URL="http://localhost:3000"`
               </div>
 
               <div className="text-sm text-gray-600">
-                소요 시간: {stageInfo.duration} •
-                실패 시각: {new Date(stageInfo.timestamp).toLocaleString()}
+                Duration: {stageInfo.duration} •
+                Failed At: {new Date(stageInfo.timestamp).toLocaleString('en-US')}
               </div>
             </div>
           </Card>
 
-          {/* LLM 분석 */}
+          {/* LLM Analysis */}
           <Card className="mb-8">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-gray-800">🤖 AI 실패 원인 분석</h2>
-              <Badge variant="success">신뢰도 {llmAnalysis.confidence}%</Badge>
+              <h2 className="text-2xl font-bold text-gray-800">🤖 AI Failure Analysis</h2>
+              <Badge variant="success">Confidence {llmAnalysis.confidence}%</Badge>
             </div>
 
             <div className="bg-blue-50 p-4 rounded-lg mb-6">
               <p className="text-gray-700">{llmAnalysis.summary}</p>
             </div>
 
-            {/* 근본 원인 */}
+            {/* Root Causes */}
             <div className="mb-6">
-              <h3 className="text-lg font-bold mb-3 text-gray-800">근본 원인</h3>
+              <h3 className="text-lg font-bold mb-3 text-gray-800">Root Causes</h3>
               <div className="space-y-3">
                 {llmAnalysis.rootCause.map((cause, index) => (
                   <div key={index} className="border-l-4 border-red-400 pl-4 py-2">
@@ -277,9 +277,9 @@ NEXT_PUBLIC_API_URL="http://localhost:3000"`
               </div>
             </div>
 
-            {/* 개선 제안 */}
+            {/* Suggestions */}
             <div>
-              <h3 className="text-lg font-bold mb-3 text-gray-800">💡 개선 제안</h3>
+              <h3 className="text-lg font-bold mb-3 text-gray-800">💡 Suggestions</h3>
               <div className="space-y-3">
                 {llmAnalysis.suggestions.map((suggestion, index) => (
                   <div key={index} className="bg-white border border-gray-200 rounded-lg p-4">
@@ -290,12 +290,12 @@ NEXT_PUBLIC_API_URL="http://localhost:3000"`
                       </div>
                       <Badge
                         variant={
-                          suggestion.priority === "높음" ? "error" :
-                          suggestion.priority === "중간" ? "warning" :
+                          suggestion.priority === "High" ? "error" :
+                          suggestion.priority === "Medium" ? "warning" :
                           "default"
                         }
                       >
-                        우선순위: {suggestion.priority}
+                        Priority: {suggestion.priority}
                       </Badge>
                     </div>
                     <p className="text-sm text-gray-600 mb-2">{suggestion.description}</p>
@@ -310,15 +310,15 @@ NEXT_PUBLIC_API_URL="http://localhost:3000"`
             </div>
           </Card>
 
-          {/* 취약점 요약 */}
+          {/* Vulnerability Summary */}
           <Card className="mb-8">
-            <h2 className="text-2xl font-bold mb-6 text-gray-800">🛡️ 보안 취약점 요약</h2>
+            <h2 className="text-2xl font-bold mb-6 text-gray-800">🛡️ Security Vulnerability Summary</h2>
 
             <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-lg mb-6">
               <p className="text-yellow-800">{vulnerabilities.summary}</p>
             </div>
 
-            {/* 취약점 통계 */}
+            {/* Vulnerability Statistics */}
             <div className="grid grid-cols-4 gap-4 mb-6">
               <div className="text-center p-4 bg-red-50 rounded-lg">
                 <div className="text-3xl font-bold text-red-600">{vulnerabilities.critical}</div>
@@ -338,10 +338,10 @@ NEXT_PUBLIC_API_URL="http://localhost:3000"`
               </div>
             </div>
 
-            {/* HIGH 취약점 상세 */}
+            {/* HIGH Vulnerability Details */}
             {vulnerabilities.high.length > 0 && (
               <div className="mb-4">
-                <h3 className="font-bold text-red-700 mb-3">🔴 HIGH 취약점</h3>
+                <h3 className="font-bold text-red-700 mb-3">🔴 HIGH Vulnerabilities</h3>
                 <div className="space-y-2">
                   {vulnerabilities.high.map((vuln, index) => (
                     <div key={index} className="bg-red-50 border border-red-200 p-3 rounded-lg">
@@ -362,10 +362,10 @@ NEXT_PUBLIC_API_URL="http://localhost:3000"`
               </div>
             )}
 
-            {/* MEDIUM 취약점 요약 */}
+            {/* MEDIUM Vulnerability Summary */}
             {vulnerabilities.medium.length > 0 && (
               <div>
-                <h3 className="font-bold text-yellow-700 mb-3">🟡 MEDIUM 취약점 ({vulnerabilities.medium.length}개)</h3>
+                <h3 className="font-bold text-yellow-700 mb-3">🟡 MEDIUM Vulnerabilities ({vulnerabilities.medium.length})</h3>
                 <div className="bg-yellow-50 p-3 rounded-lg">
                   <ul className="text-sm text-gray-700 space-y-1">
                     {vulnerabilities.medium.map((vuln, index) => (
@@ -379,9 +379,9 @@ NEXT_PUBLIC_API_URL="http://localhost:3000"`
             )}
           </Card>
 
-          {/* 에러 로그 */}
+          {/* Error Logs */}
           <Card className="mb-8">
-            <h2 className="text-2xl font-bold mb-6 text-gray-800">📋 에러 로그</h2>
+            <h2 className="text-2xl font-bold mb-6 text-gray-800">📋 Error Logs</h2>
             <div className="bg-gray-900 text-gray-300 p-4 rounded-lg font-mono text-sm space-y-1 max-h-64 overflow-y-auto">
               {errorLogs.map((log, index) => (
                 <div key={index} className="flex gap-3">
@@ -401,16 +401,16 @@ NEXT_PUBLIC_API_URL="http://localhost:3000"`
             </div>
           </Card>
 
-          {/* 액션 버튼 */}
+          {/* Action Buttons */}
           <div className="flex gap-4 justify-center">
             <Link href="/history">
               <Button size="lg" variant="secondary" className="px-8">
-                목록으로 돌아가기
+                Back to List
               </Button>
             </Link>
             <Link href={`/history/${deploymentId}`}>
               <Button size="lg" variant="secondary" className="px-8">
-                전체 상세보기
+                View Full Details
               </Button>
             </Link>
             <Button
@@ -418,7 +418,7 @@ NEXT_PUBLIC_API_URL="http://localhost:3000"`
               onClick={handleRetry}
               className="px-8 bg-blue-600 hover:bg-blue-700"
             >
-              🔄 다시 배포하기
+              🔄 Redeploy
             </Button>
           </div>
         </div>

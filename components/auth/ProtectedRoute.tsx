@@ -2,8 +2,8 @@
 
 // ============================================================================
 // PROTECTED ROUTE
-// 인증이 필요한 페이지를 보호하는 컴포넌트
-// 디버깅: 리다이렉트 로직 명확화
+// Component that protects pages requiring authentication
+// Debugging: Clarifying redirect logic
 // ============================================================================
 
 import { useEffect } from "react";
@@ -21,7 +21,7 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   const mockAuth = useMockAuth();
   const router = useRouter();
 
-  // MockAuth 또는 Auth 중 하나라도 인증되어 있으면 OK
+  // OK if either MockAuth or Auth is authenticated
   const isAuthenticated = auth.isAuthenticated || mockAuth.isAuthenticated;
   const isLoading = auth.isLoading || mockAuth.isLoading;
 
@@ -39,7 +39,7 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
     }
   }, [isAuthenticated, isLoading, router]);
 
-  // 로딩 중
+  // Loading
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-blue-50">
@@ -51,11 +51,11 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
     );
   }
 
-  // 인증되지 않음
+  // Not authenticated
   if (!isAuthenticated) {
     return null;
   }
 
-  // 인증됨
+  // Authenticated
   return <>{children}</>;
 }

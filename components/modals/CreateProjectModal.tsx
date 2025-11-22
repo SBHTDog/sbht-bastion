@@ -1,4 +1,4 @@
-// 프로젝트 생성 모달 - Enhanced Glassmorphism + Responsive
+// Project Creation Modal - Enhanced Glassmorphism + Responsive
 "use client";
 
 import { useState } from "react";
@@ -43,7 +43,7 @@ export default function CreateProjectModal({ isOpen, onClose }: CreateProjectMod
       selectedRepo,
     });
 
-    alert(`프로젝트 "${projectName}" 생성 완료! (목 데이터)`);
+    alert(`Project "${projectName}" created successfully! (Mock data)`);
     onClose();
     setStep(1);
     setSelectedRepo("");
@@ -59,7 +59,7 @@ export default function CreateProjectModal({ isOpen, onClose }: CreateProjectMod
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} title="새 프로젝트">
+    <Modal isOpen={isOpen} onClose={handleClose} title="New Project">
       {/* Step Indicator */}
       <div className="flex items-center gap-2 mb-6">
         <div className={`h-1.5 flex-1 rounded-full transition-all ${step >= 1 ? "bg-blue-600" : "bg-gray-200"}`} />
@@ -69,14 +69,14 @@ export default function CreateProjectModal({ isOpen, onClose }: CreateProjectMod
         </span>
       </div>
 
-      {/* Step 1: 레포 선택 */}
+      {/* Step 1: Repository Selection */}
       {step === 1 && (
         <div className="space-y-4">
-          {/* 검색 */}
+          {/* Search */}
           <div className="relative">
             <input
               type="text"
-              placeholder="레포 검색..."
+              placeholder="Search repository..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full px-4 py-3 pl-10 bg-white/80 backdrop-blur-sm border border-blue-200 rounded-lg font-medium focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition-all"
@@ -91,7 +91,7 @@ export default function CreateProjectModal({ isOpen, onClose }: CreateProjectMod
             </svg>
           </div>
 
-          {/* 레포 목록 */}
+          {/* Repository List */}
           <div className="space-y-2 max-h-60 sm:max-h-72 overflow-y-auto custom-scrollbar">
             {filteredRepos.map((repo) => (
               <div
@@ -127,14 +127,14 @@ export default function CreateProjectModal({ isOpen, onClose }: CreateProjectMod
             ))}
           </div>
 
-          {/* 다음 */}
+          {/* Next */}
           <Button onClick={handleNext} disabled={!selectedRepo} className="w-full justify-center">
-            다음
+            Next
           </Button>
         </div>
       )}
 
-      {/* Step 2: 프로젝트 설정 */}
+      {/* Step 2: Project Settings */}
       {step === 2 && repo && (
         <div className="space-y-4">
           {/* Repository Info */}
@@ -143,22 +143,22 @@ export default function CreateProjectModal({ isOpen, onClose }: CreateProjectMod
             <div className="font-bold text-gray-800 truncate">{repo.fullName}</div>
           </div>
 
-          {/* 프로젝트 이름 */}
+          {/* Project Name */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">이름</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Name</label>
             <input
               type="text"
               value={projectName}
               onChange={(e) => setProjectName(e.target.value)}
               className="w-full px-4 py-3 bg-white/80 backdrop-blur-sm border border-blue-200 rounded-lg font-medium focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition-all"
-              placeholder="프로젝트 이름"
+              placeholder="Project name"
             />
           </div>
 
-          {/* 브랜치 & 환경 - 반응형 그리드 */}
+          {/* Branch & Environment - Responsive Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">브랜치</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Branch</label>
               <select
                 value={branch}
                 onChange={(e) => setBranch(e.target.value)}
@@ -171,7 +171,7 @@ export default function CreateProjectModal({ isOpen, onClose }: CreateProjectMod
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">환경</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Environment</label>
               <select
                 value={environment}
                 onChange={(e) =>
@@ -186,17 +186,17 @@ export default function CreateProjectModal({ isOpen, onClose }: CreateProjectMod
             </div>
           </div>
 
-          {/* 액션 */}
+          {/* Actions */}
           <div className="flex gap-2 pt-2">
             <Button variant="ghost" onClick={() => setStep(1)} className="flex-1 sm:flex-initial">
-              뒤로
+              Back
             </Button>
             <Button
               onClick={handleCreate}
               disabled={!projectName}
               className="flex-1 sm:flex-initial justify-center"
             >
-              생성
+              Create
             </Button>
           </div>
         </div>

@@ -34,32 +34,32 @@ export default function DeployResult({
   const router = useRouter();
   const [showResult, setShowResult] = useState(false);
 
-  // 목데이터
+  // Mock data
   const mockEcsRevision = "arn:aws:ecs:ap-northeast-2:123456789:task-definition/frontend-app:42";
   const mockCodeDeployId = "d-X9Y8Z7W6V5";
   const mockServiceName = "frontend-app-service";
   const mockClusterName = "production-cluster";
   const mockDeploymentGroup = "frontend-prod-deploy-group";
 
-  // 실패 분석 목데이터
+  // Failure analysis mock data
   const failureAnalysis = {
     failedStage: stages.find(s => s.status === "failed")?.name || "Test",
-    summary: "테스트 단계에서 단위 테스트 2개가 실패했습니다. Header 컴포넌트의 타이틀 텍스트가 예상값과 일치하지 않습니다.",
+    summary: "2 unit tests failed in the test stage. The Header component's title text does not match the expected value.",
     suggestions: [
-      "Header.test.tsx 파일의 테스트 케이스를 최신 컴포넌트 변경사항에 맞게 업데이트",
-      "환경 변수 NEXT_PUBLIC_APP_TITLE이 테스트 환경에서 올바르게 설정되었는지 확인",
-      "의존성 패키지 버전 충돌 가능성 점검 (특히 @testing-library/react)"
+      "Update test cases in Header.test.tsx to match the latest component changes",
+      "Verify that the NEXT_PUBLIC_APP_TITLE environment variable is properly set in the test environment",
+      "Check for possible dependency package version conflicts (especially @testing-library/react)"
     ]
   };
 
   useEffect(() => {
-    // 결과 화면 표시 애니메이션
+    // Result screen display animation
     setTimeout(() => setShowResult(true), 100);
 
-    // 성공 시 축하 효과
+    // Celebration effect on success
     if (status === "success") {
       setTimeout(() => {
-        // 좌측 캐논
+        // Left cannon
         confetti({
           particleCount: 100,
           spread: 70,
@@ -67,7 +67,7 @@ export default function DeployResult({
           colors: ["#10b981", "#22c55e", "#86efac"],
         });
 
-        // 우측 캐논
+        // Right cannon
         confetti({
           particleCount: 100,
           spread: 70,
@@ -75,7 +75,7 @@ export default function DeployResult({
           colors: ["#10b981", "#22c55e", "#86efac"],
         });
 
-        // 중앙 캐논
+        // Center cannon
         confetti({
           particleCount: 150,
           spread: 100,
@@ -96,7 +96,7 @@ export default function DeployResult({
         showResult ? "scale-100 opacity-100" : "scale-95 opacity-0"
       }`}
     >
-      {/* 결과 헤더 카드 */}
+      {/* Result header card */}
       <Card
         className={`mb-8 border-4 ${
           status === "success"
@@ -105,7 +105,7 @@ export default function DeployResult({
         }`}
       >
         <div className="text-center py-12">
-          {/* 상태 아이콘 */}
+          {/* Status icon */}
           <div className="mb-6">
             {status === "success" ? (
               <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-green-500 text-white animate-bounce">
@@ -122,20 +122,20 @@ export default function DeployResult({
             )}
           </div>
 
-          {/* 결과 메시지 */}
+          {/* Result message */}
           <h1
             className={`text-4xl font-bold mb-4 ${
               status === "success" ? "text-green-700" : "text-red-700"
             }`}
           >
-            {status === "success" ? "⚾ 홈런! 만루홈런급 완벽한 배포!" : "⚾ 삼진 아웃! 배포 실패"}
+            {status === "success" ? "⚾ Home Run! Perfect Grand Slam Deployment!" : "⚾ Strike Out! Deployment Failed"}
           </h1>
 
           {status === "success" && (
-            <p className="text-xl text-green-600 mb-2">🏆 완봉승! 에러 없는 깔끔한 경기였습니다!</p>
+            <p className="text-xl text-green-600 mb-2">🏆 Perfect Game! Clean deployment with no errors!</p>
           )}
           {status === "failed" && (
-            <p className="text-xl text-red-600 mb-2">😢 아쉬운 경기! 다시 도전해보세요!</p>
+            <p className="text-xl text-red-600 mb-2">😢 Tough game! Try again!</p>
           )}
 
           <p className="text-xl text-gray-600 mb-2">
@@ -143,18 +143,18 @@ export default function DeployResult({
           </p>
 
           <p className="text-gray-500">
-            총 소요시간: {Math.floor(totalDuration / 60)}분 {totalDuration % 60}초
+            Total Duration: {Math.floor(totalDuration / 60)}m {totalDuration % 60}s
           </p>
         </div>
       </Card>
 
-      {/* 성공 시 AWS 배포 정보 */}
+      {/* AWS deployment info on success */}
       {status === "success" && (
         <Card className="mb-8 bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-300">
-          <h2 className="text-2xl font-bold mb-6 text-gray-800">🚀 AWS 배포 정보</h2>
+          <h2 className="text-2xl font-bold mb-6 text-gray-800">🚀 AWS Deployment Info</h2>
 
           <div className="grid md:grid-cols-2 gap-6">
-            {/* ECS 정보 */}
+            {/* ECS info */}
             <div className="bg-white/80 p-4 rounded-lg">
               <h3 className="font-bold text-lg mb-3 text-blue-700">ECS Task Definition</h3>
               <div className="space-y-2 text-sm">
@@ -176,7 +176,7 @@ export default function DeployResult({
               </div>
             </div>
 
-            {/* CodeDeploy 정보 */}
+            {/* CodeDeploy info */}
             <div className="bg-white/80 p-4 rounded-lg">
               <h3 className="font-bold text-lg mb-3 text-green-700">CodeDeploy Status</h3>
               <div className="space-y-2 text-sm">
@@ -199,7 +199,7 @@ export default function DeployResult({
                     </div>
                     <span className="text-xs text-green-600 font-bold">100%</span>
                   </div>
-                  <div className="text-xs text-gray-500 mt-1">Blue/Green 배포 완료</div>
+                  <div className="text-xs text-gray-500 mt-1">Blue/Green deployment complete</div>
                 </div>
               </div>
             </div>
@@ -207,26 +207,26 @@ export default function DeployResult({
         </Card>
       )}
 
-      {/* 실패 시 분석 정보 */}
+      {/* Failure analysis on failed deployment */}
       {status === "failed" && (
         <Card className="mb-8 border-2 border-red-300 bg-red-50">
-          <h2 className="text-2xl font-bold mb-6 text-red-700">🔍 실패 분석</h2>
+          <h2 className="text-2xl font-bold mb-6 text-red-700">🔍 Failure Analysis</h2>
 
-          {/* 실패 단계 */}
+          {/* Failed stage */}
           <div className="bg-white/80 p-4 rounded-lg mb-4">
             <div className="flex items-center gap-3 mb-3">
               <span className="text-red-600 text-2xl">⚾</span>
               <div>
-                <h3 className="font-bold text-lg text-gray-800">스트라이크 아웃 단계: {failureAnalysis.failedStage}</h3>
-                <p className="text-gray-600 text-sm mt-1">🎤 "{failureAnalysis.failedStage} 타자가 삼진으로 물러났습니다!"</p>
+                <h3 className="font-bold text-lg text-gray-800">Strike Out Stage: {failureAnalysis.failedStage}</h3>
+                <p className="text-gray-600 text-sm mt-1">🎤 "The {failureAnalysis.failedStage} batter struck out!"</p>
                 <p className="text-gray-600 text-sm mt-1">{failureAnalysis.summary}</p>
               </div>
             </div>
           </div>
 
-          {/* 개선 제안 */}
+          {/* Improvement suggestions */}
           <div className="bg-white/80 p-4 rounded-lg">
-            <h3 className="font-bold text-lg mb-3 text-gray-800">💡 개선 제안</h3>
+            <h3 className="font-bold text-lg mb-3 text-gray-800">💡 Improvement Suggestions</h3>
             <ul className="space-y-2">
               {failureAnalysis.suggestions.map((suggestion, index) => (
                 <li key={index} className="flex items-start gap-2 text-sm text-gray-700">
@@ -237,9 +237,9 @@ export default function DeployResult({
             </ul>
           </div>
 
-          {/* 에러 로그 */}
+          {/* Error logs */}
           <div className="mt-4">
-            <h3 className="font-bold text-lg mb-3 text-gray-800">📋 상세 로그</h3>
+            <h3 className="font-bold text-lg mb-3 text-gray-800">📋 Detailed Logs</h3>
             <div className="dev-minimal bg-gray-900 text-red-400 p-4 rounded-lg font-mono text-sm">
               <div>[ERROR] Test suite failed at 14:25:03</div>
               <div>  ✕ src/components/Header.test.tsx (2 failed, 8 passed)</div>
@@ -256,11 +256,11 @@ export default function DeployResult({
         </Card>
       )}
 
-      {/* 스테이지 상세 결과 */}
+      {/* Stage detailed results */}
       <Card className="mb-8">
-        <h2 className="text-2xl font-bold mb-6 text-gray-800">⚾ 이닝별 경기 결과</h2>
+        <h2 className="text-2xl font-bold mb-6 text-gray-800">⚾ Inning-by-Inning Results</h2>
 
-        {/* 스테이지 그리드 */}
+        {/* Stage grid */}
         <div className="grid grid-cols-3 gap-4 mb-6">
           {stages.map((stage, index) => (
             <div
@@ -293,37 +293,37 @@ export default function DeployResult({
           ))}
         </div>
 
-        {/* 요약 통계 */}
+        {/* Summary statistics */}
         <div className="grid grid-cols-3 gap-4 pt-6 border-t border-gray-200">
           <div className="text-center">
             <div className="text-3xl font-bold text-green-600">{successCount}</div>
-            <div className="text-sm text-gray-600">성공</div>
+            <div className="text-sm text-gray-600">Success</div>
           </div>
           <div className="text-center">
             <div className="text-3xl font-bold text-red-600">{failedCount}</div>
-            <div className="text-sm text-gray-600">실패</div>
+            <div className="text-sm text-gray-600">Failed</div>
           </div>
           <div className="text-center">
             <div className="text-3xl font-bold text-gray-600">
               {stages.length - successCount - failedCount}
             </div>
-            <div className="text-sm text-gray-600">건너뜀</div>
+            <div className="text-sm text-gray-600">Skipped</div>
           </div>
         </div>
       </Card>
 
-      {/* 액션 버튼들 */}
+      {/* Action buttons */}
       <div className="flex gap-4 justify-center">
         {status === "success" ? (
           <>
             <Link href={`/project/${projectId}`}>
               <Button size="lg" className="px-8">
-                프로젝트로 돌아가기
+                Back to Project
               </Button>
             </Link>
             <Link href={`/project/${projectId}/reports/deploy-1`}>
               <Button size="lg" variant="secondary" className="px-8">
-                상세 리포트 보기
+                View Detailed Report
               </Button>
             </Link>
           </>
@@ -334,11 +334,11 @@ export default function DeployResult({
               onClick={onRetry || (() => window.location.reload())}
               className="px-8 bg-blue-600 hover:bg-blue-700"
             >
-              🔄 다시 시도
+              🔄 Retry
             </Button>
             <Link href={`/project/${projectId}`}>
               <Button size="lg" variant="secondary" className="px-8">
-                프로젝트로 돌아가기
+                Back to Project
               </Button>
             </Link>
           </>

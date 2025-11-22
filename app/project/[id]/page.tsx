@@ -1,6 +1,6 @@
 "use client";
 
-// 프로젝트 상세 페이지
+// Project Detail Page
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
@@ -20,16 +20,16 @@ export default function ProjectDetailPage() {
   const project = mockProjects.find((p) => p.id === projectId);
   const deployments = mockDeployments
     .filter((d) => d.projectId === projectId)
-    .slice(0, 3); // 최근 3개만
+    .slice(0, 3); // Only the 3 most recent
 
   if (!project) {
     return (
       <ProtectedRoute>
         <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center">
           <Card>
-            <h1 className="text-xl font-bold text-gray-800 mb-4">프로젝트를 찾을 수 없습니다</h1>
+            <h1 className="text-xl font-bold text-gray-800 mb-4">Project not found</h1>
             <Link href="/dashboard">
-              <Button>대시보드로 돌아가기</Button>
+              <Button>Back to dashboard</Button>
             </Link>
           </Card>
         </div>
@@ -65,7 +65,7 @@ export default function ProjectDetailPage() {
         </nav>
 
         <div className="container mx-auto p-8">
-          {/* 프로젝트 헤더 */}
+          {/* Project Header */}
           <div className="mb-10">
             <div className="flex items-center gap-3 mb-4">
               <h1 className="text-4xl font-bold text-gray-800">{project.name}</h1>
@@ -79,7 +79,7 @@ export default function ProjectDetailPage() {
             </p>
           </div>
 
-          {/* 통계 */}
+          {/* Statistics */}
           <div className="grid md:grid-cols-3 gap-6 mb-12">
             <Card>
               <div className="text-gray-500 text-sm mb-2 font-medium">Total Deploys</div>
@@ -95,23 +95,23 @@ export default function ProjectDetailPage() {
             </Card>
           </div>
 
-          {/* 배포 시작 버튼 */}
+          {/* Start Deployment Button */}
           <Card className="mb-12">
             <div className="flex justify-between items-center">
               <div>
-                <h2 className="text-2xl font-bold text-gray-800 mb-2">새 배포 시작</h2>
+                <h2 className="text-2xl font-bold text-gray-800 mb-2">Start New Deployment</h2>
                 <p className="text-gray-600">
-                  현재 브랜치: <strong>{project.branch}</strong>
+                  Current Branch: <strong>{project.branch}</strong>
                 </p>
               </div>
               <Button onClick={handleDeploy} size="lg">
-                🚀 배포 시작
+                🚀 Start Deployment
               </Button>
             </div>
           </Card>
 
-          {/* 최근 배포 */}
-          <h2 className="text-3xl font-bold mb-6 text-gray-800">최근 배포</h2>
+          {/* Recent Deployments */}
+          <h2 className="text-3xl font-bold mb-6 text-gray-800">Recent Deployments</h2>
           <div className="space-y-4">
             {deployments.map((deploy) => (
               <Card key={deploy.id}>
@@ -137,7 +137,7 @@ export default function ProjectDetailPage() {
                   </div>
                   <Link href={`/project/${projectId}/reports/${deploy.id}`}>
                     <Button variant="ghost" size="sm">
-                      상세 보기
+                      View Details
                     </Button>
                   </Link>
                 </div>

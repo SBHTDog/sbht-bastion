@@ -1,4 +1,4 @@
-// 로그인 모달 - Enhanced Glassmorphism + Responsive
+// Login Modal - Enhanced Glassmorphism + Responsive
 "use client";
 
 import { useState } from "react";
@@ -36,12 +36,12 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
       router.push("/dashboard");
     } else {
       setIsLoading(false);
-      alert("로그인 실패");
+      alert("Login failed");
     }
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="로그인">
+    <Modal isOpen={isOpen} onClose={onClose} title="Login">
       <form onSubmit={handleLogin} className="space-y-6">
         {/* GitHub Icon */}
         <div className="flex justify-center mb-4">
@@ -52,10 +52,10 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
           </div>
         </div>
 
-        {/* 계정 선택 */}
+        {/* Account selection */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            테스트 계정 선택
+            Select Test Account
           </label>
           <select
             value={selectedUser}
@@ -63,7 +63,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
             className="w-full px-4 py-3 bg-white/80 backdrop-blur-sm border border-blue-200 rounded-lg font-medium focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition-all"
             disabled={isLoading}
           >
-            <option value="">선택</option>
+            <option value="">Choose</option>
             {mockUsers.map((user) => (
               <option key={user.id} value={user.githubUsername}>
                 {user.name} (@{user.githubUsername})
@@ -72,7 +72,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
           </select>
         </div>
 
-        {/* 로그인 버튼 */}
+        {/* Login button */}
         <Button
           type="submit"
           disabled={isLoading || !selectedUser}
@@ -81,17 +81,17 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
           {isLoading ? (
             <>
               <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              <span>로그인 중...</span>
+              <span>Signing in...</span>
             </>
           ) : (
-            "GitHub 로그인"
+            "Sign in with GitHub"
           )}
         </Button>
 
-        {/* 안내 */}
+        {/* Info */}
         <div className="bg-blue-50/80 backdrop-blur-sm border border-blue-200 rounded-lg p-3 sm:p-4">
           <p className="text-xs sm:text-sm text-blue-800">
-            💡 목 데이터 테스트용 계정입니다
+            💡 Test account for mock data demonstration
           </p>
         </div>
       </form>

@@ -17,7 +17,7 @@ export default function HistoryDetailPage() {
   const mockAuth = useMockAuth();
   const user = mockAuth.isAuthenticated ? mockAuth.user : auth.user;
 
-  // 목데이터 - 실제로는 API에서 가져옴
+  // Mock data - In production, this would be fetched from an API
   const deployment = {
     id: deploymentId,
     version: "v1.2.3",
@@ -31,7 +31,7 @@ export default function HistoryDetailPage() {
     commitMessage: "feat: Add new deployment monitoring features"
   };
 
-  // 빌드 타임라인 데이터
+  // Build timeline data
   const timeline = [
     { stage: "Checkout", duration: "5s", status: "success" },
     { stage: "Dependencies", duration: "45s", status: "success" },
@@ -44,7 +44,7 @@ export default function HistoryDetailPage() {
     { stage: "Health Check", duration: deployment.status === "failed" ? "-" : "10s", status: deployment.status === "failed" ? "skipped" : "success" },
   ];
 
-  // Trivy 스캔 결과
+  // Trivy scan results
   const trivyResults = {
     critical: 0,
     high: 2,
@@ -78,7 +78,7 @@ export default function HistoryDetailPage() {
     ]
   };
 
-  // Jenkins 로그 요약
+  // Jenkins log summary
   const jenkinsLogs = [
     { time: "14:23:45", level: "INFO", message: "Build started for frontend-app #42" },
     { time: "14:23:46", level: "INFO", message: "Checking out from git repository" },
@@ -88,7 +88,7 @@ export default function HistoryDetailPage() {
     { time: "14:26:49", level: "INFO", message: deployment.status === "failed" ? "Build aborted due to test failure" : "Build completed successfully" },
   ];
 
-  // ECS & Blue/Green 정보
+  // ECS & Blue/Green information
   const ecsInfo = {
     taskDefinition: "frontend-app:42",
     revision: 42,
@@ -139,36 +139,36 @@ export default function HistoryDetailPage() {
           <div className="mb-8">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-4">
-                <h1 className="text-4xl font-bold text-gray-800">배포 상세 정보</h1>
+                <h1 className="text-4xl font-bold text-gray-800">Deployment Details</h1>
                 <Badge variant={deployment.status === "success" ? "success" : "error"}>
                   {deployment.status}
                 </Badge>
               </div>
               <Link href="/history">
-                <Button variant="secondary">← 목록으로</Button>
+                <Button variant="secondary">← Back to list</Button>
               </Link>
             </div>
 
-            {/* 기본 정보 */}
+            {/* Basic Information */}
             <div className="grid grid-cols-3 gap-4">
               <div>
-                <span className="text-gray-500 text-sm">버전</span>
+                <span className="text-gray-500 text-sm">Version</span>
                 <p className="text-lg font-bold text-gray-800">{deployment.version}</p>
               </div>
               <div>
-                <span className="text-gray-500 text-sm">프로젝트</span>
+                <span className="text-gray-500 text-sm">Project</span>
                 <p className="text-lg font-bold text-gray-800">{deployment.projectName}</p>
               </div>
               <div>
-                <span className="text-gray-500 text-sm">브랜치</span>
+                <span className="text-gray-500 text-sm">Branch</span>
                 <p className="text-lg font-bold text-gray-800">{deployment.branch}</p>
               </div>
             </div>
           </div>
 
-          {/* 빌드 타임라인 */}
+          {/* Build Timeline */}
           <Card className="mb-8">
-            <h2 className="text-2xl font-bold mb-6 text-gray-800">📊 빌드 타임라인</h2>
+            <h2 className="text-2xl font-bold mb-6 text-gray-800">📊 Build Timeline</h2>
             <div className="space-y-3">
               {timeline.map((item, index) => (
                 <div key={index} className="flex items-center gap-4">
@@ -203,19 +203,19 @@ export default function HistoryDetailPage() {
             </div>
             <div className="mt-4 pt-4 border-t border-gray-200">
               <div className="flex justify-between text-sm">
-                <span className="text-gray-600">총 소요시간</span>
+                <span className="text-gray-600">Total Duration</span>
                 <span className="font-bold text-gray-800">
-                  {Math.floor(deployment.duration / 60000)}분 {Math.floor((deployment.duration % 60000) / 1000)}초
+                  {Math.floor(deployment.duration / 60000)}m {Math.floor((deployment.duration % 60000) / 1000)}s
                 </span>
               </div>
             </div>
           </Card>
 
-          {/* Trivy 스캔 결과 */}
+          {/* Trivy Scan Results */}
           <Card className="mb-8">
-            <h2 className="text-2xl font-bold mb-6 text-gray-800">🛡️ Trivy 보안 스캔 결과</h2>
+            <h2 className="text-2xl font-bold mb-6 text-gray-800">🛡️ Trivy Security Scan Results</h2>
 
-            {/* 요약 */}
+            {/* Summary */}
             <div className="grid grid-cols-4 gap-4 mb-6">
               <div className="text-center p-4 bg-red-50 rounded-lg">
                 <div className="text-3xl font-bold text-red-600">{trivyResults.critical}</div>
@@ -235,9 +235,9 @@ export default function HistoryDetailPage() {
               </div>
             </div>
 
-            {/* 주요 취약점 */}
+            {/* Major Vulnerabilities */}
             <div className="space-y-3">
-              <h3 className="font-bold text-gray-800">주요 취약점</h3>
+              <h3 className="font-bold text-gray-800">Major Vulnerabilities</h3>
               {trivyResults.vulnerabilities.map((vuln, index) => (
                 <div key={index} className="p-3 bg-gray-50 rounded-lg border border-gray-200">
                   <div className="flex justify-between items-start mb-2">
@@ -255,9 +255,9 @@ export default function HistoryDetailPage() {
             </div>
           </Card>
 
-          {/* Jenkins 로그 요약 */}
+          {/* Jenkins Log Summary */}
           <Card className="mb-8">
-            <h2 className="text-2xl font-bold mb-6 text-gray-800">📋 Jenkins 로그 요약</h2>
+            <h2 className="text-2xl font-bold mb-6 text-gray-800">📋 Jenkins Log Summary</h2>
             <div className="bg-gray-900 text-gray-300 p-4 rounded-lg font-mono text-sm space-y-1 max-h-64 overflow-y-auto">
               {jenkinsLogs.map((log, index) => (
                 <div key={index} className="flex gap-3">
@@ -275,7 +275,7 @@ export default function HistoryDetailPage() {
             </div>
           </Card>
 
-          {/* ECS & Blue/Green 정보 */}
+          {/* ECS & Blue/Green Information */}
           <div className="grid md:grid-cols-2 gap-8 mb-8">
             {/* ECS Task Revision */}
             <Card>
@@ -314,9 +314,9 @@ export default function HistoryDetailPage() {
               </div>
             </Card>
 
-            {/* Blue/Green 라우팅 */}
+            {/* Blue/Green Routing */}
             <Card>
-              <h3 className="text-xl font-bold mb-4 text-gray-800">🔄 Blue/Green 배포</h3>
+              <h3 className="text-xl font-bold mb-4 text-gray-800">🔄 Blue/Green Deployment</h3>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Deployment ID</span>
@@ -327,15 +327,15 @@ export default function HistoryDetailPage() {
                   <span className="font-mono">{blueGreenInfo.deploymentGroup}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Blue (이전)</span>
+                  <span className="text-gray-600">Blue (Previous)</span>
                   <span className="font-mono text-blue-600">{blueGreenInfo.blueTaskSet}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Green (신규)</span>
+                  <span className="text-gray-600">Green (New)</span>
                   <span className="font-mono text-green-600">{blueGreenInfo.greenTaskSet}</span>
                 </div>
                 <div className="mt-3 p-3 bg-gray-50 rounded-lg">
-                  <div className="text-sm font-bold text-gray-700 mb-2">트래픽 라우팅</div>
+                  <div className="text-sm font-bold text-gray-700 mb-2">Traffic Routing</div>
                   <div className="flex items-center gap-2">
                     <div className="flex-1 h-4 bg-gray-200 rounded-full overflow-hidden">
                       <div
@@ -348,24 +348,24 @@ export default function HistoryDetailPage() {
                 </div>
                 {blueGreenInfo.rollbackAvailable && (
                   <div className="mt-3 p-2 bg-yellow-50 border border-yellow-200 rounded">
-                    <span className="text-xs text-yellow-800">⚠️ 롤백 가능</span>
+                    <span className="text-xs text-yellow-800">⚠️ Rollback Available</span>
                   </div>
                 )}
               </div>
             </Card>
           </div>
 
-          {/* 하단 액션 버튼 */}
+          {/* Bottom Action Buttons */}
           <div className="flex gap-4 justify-center">
             <Link href="/history">
               <Button size="lg" variant="secondary" className="px-8">
-                목록으로 돌아가기
+                Back to List
               </Button>
             </Link>
             {deployment.status === "failed" && (
               <Link href={`/project/${deployment.projectName}/deploy`}>
                 <Button size="lg" className="px-8">
-                  다시 배포하기
+                  Redeploy
                 </Button>
               </Link>
             )}

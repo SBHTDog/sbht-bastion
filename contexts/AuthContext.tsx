@@ -23,7 +23,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession();
 
-  // NextAuth 세션을 AuthState로 변환
+  // Convert NextAuth session to AuthState
   const authState: AuthState = {
     user: session?.user ? {
       id: session.user.id || "",
@@ -40,7 +40,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     isLoading: status === "loading",
   };
 
-  // 로그아웃 함수
+  // Logout function
   const logout = () => {
     signOut({ callbackUrl: "/" });
   };

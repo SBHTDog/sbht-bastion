@@ -1,6 +1,6 @@
 "use client";
 
-// 배포 상세 리포트 페이지
+// Deployment Detail Report Page
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
@@ -25,9 +25,9 @@ export default function DeployReportPage() {
       <ProtectedRoute>
         <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center">
           <Card>
-            <h1 className="text-xl font-bold text-gray-800 mb-4">리포트를 찾을 수 없습니다</h1>
+            <h1 className="text-xl font-bold text-gray-800 mb-4">Report not found</h1>
             <Link href={`/project/${projectId}`}>
-              <Button>프로젝트로 돌아가기</Button>
+              <Button>Back to project</Button>
             </Link>
           </Card>
         </div>
@@ -67,10 +67,10 @@ export default function DeployReportPage() {
         </nav>
 
         <div className="container mx-auto p-8">
-          {/* 헤더 */}
+          {/* Header */}
           <div className="mb-10">
             <div className="flex items-center gap-3 mb-4">
-              <h1 className="text-4xl font-bold text-gray-800">배포 리포트</h1>
+              <h1 className="text-4xl font-bold text-gray-800">Deployment Report</h1>
               <Badge variant={isSuccess ? "success" : "error"}>{deployment.status}</Badge>
             </div>
             <p className="text-gray-600 text-lg">
@@ -78,20 +78,20 @@ export default function DeployReportPage() {
             </p>
           </div>
 
-          {/* LLM 분석 */}
+          {/* LLM Analysis */}
           {llmAnalysis && (
             <Card className="mb-8">
-              <h2 className="text-2xl font-bold mb-4 text-gray-800">🤖 AI 분석</h2>
+              <h2 className="text-2xl font-bold mb-4 text-gray-800">🤖 AI Analysis</h2>
               <p className="text-gray-700 mb-4">{llmAnalysis.summary}</p>
               {llmAnalysis.failureReason && (
                 <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-                  <h3 className="font-bold text-red-800 mb-2">실패 원인:</h3>
+                  <h3 className="font-bold text-red-800 mb-2">Failure Reason:</h3>
                   <p className="text-red-700">{llmAnalysis.failureReason}</p>
                 </div>
               )}
               <div>
                 <h3 className="font-bold text-gray-800 mb-2">
-                  {isSuccess ? "최적화 제안:" : "개선 방안:"}
+                  {isSuccess ? "Optimization Suggestions:" : "Improvement Recommendations:"}
                 </h3>
                 <ul className="space-y-2">
                   {(llmAnalysis.recommendations || llmAnalysis.optimizations || []).map(
@@ -107,10 +107,10 @@ export default function DeployReportPage() {
             </Card>
           )}
 
-          {/* 성공 케이스 */}
+          {/* Success Case */}
           {isSuccess && analysis.jobs && (
             <Card className="mb-8">
-              <h2 className="text-2xl font-bold mb-4 text-gray-800">⏱️ Job별 소요 시간</h2>
+              <h2 className="text-2xl font-bold mb-4 text-gray-800">⏱️ Duration by Job</h2>
               <div className="space-y-3">
                 {analysis.jobs.map((job, idx) => (
                   <div key={idx} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
@@ -122,29 +122,29 @@ export default function DeployReportPage() {
             </Card>
           )}
 
-          {/* 실패 케이스 */}
+          {/* Failure Case */}
           {!isSuccess && (
             <>
-              {/* 테스트 실패 */}
+              {/* Test Failure */}
               {analysis.tests && (
                 <Card className="mb-8">
-                  <h2 className="text-2xl font-bold mb-4 text-gray-800">🧪 테스트 결과</h2>
+                  <h2 className="text-2xl font-bold mb-4 text-gray-800">🧪 Test Results</h2>
                   <div className="grid grid-cols-3 gap-4 mb-4">
                     <div>
-                      <div className="text-sm text-gray-600">전체</div>
+                      <div className="text-sm text-gray-600">Total</div>
                       <div className="text-2xl font-bold text-gray-800">{analysis.tests.total}</div>
                     </div>
                     <div>
-                      <div className="text-sm text-gray-600">통과</div>
+                      <div className="text-sm text-gray-600">Passed</div>
                       <div className="text-2xl font-bold text-green-600">{analysis.tests.passed}</div>
                     </div>
                     <div>
-                      <div className="text-sm text-gray-600">실패</div>
+                      <div className="text-sm text-gray-600">Failed</div>
                       <div className="text-2xl font-bold text-red-600">{analysis.tests.failed}</div>
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <h3 className="font-bold text-gray-800">실패한 테스트:</h3>
+                    <h3 className="font-bold text-gray-800">Failed Tests:</h3>
                     {analysis.tests.failedTests.map((test, idx) => (
                       <div key={idx} className="p-3 bg-red-50 border border-red-200 rounded-lg">
                         <div className="font-medium text-red-800 mb-1">{test.name}</div>
@@ -155,10 +155,10 @@ export default function DeployReportPage() {
                 </Card>
               )}
 
-              {/* Trivy 취약점 */}
+              {/* Trivy Vulnerabilities */}
               {analysis.trivy && (
                 <Card className="mb-8">
-                  <h2 className="text-2xl font-bold mb-4 text-gray-800">🛡️ 보안 스캔 (Trivy)</h2>
+                  <h2 className="text-2xl font-bold mb-4 text-gray-800">🛡️ Security Scan (Trivy)</h2>
                   <div className="grid grid-cols-4 gap-4 mb-4">
                     <div>
                       <div className="text-sm text-gray-600">Critical</div>
@@ -185,7 +185,7 @@ export default function DeployReportPage() {
                       </div>
                       <div className="text-sm text-gray-700 mb-1">{vuln.description}</div>
                       <div className="text-xs text-gray-600">
-                        {vuln.package}@{vuln.version} → {vuln.fixedVersion || "패치 없음"}
+                        {vuln.package}@{vuln.version} → {vuln.fixedVersion || "No patch"}
                       </div>
                     </div>
                   ))}
@@ -194,40 +194,40 @@ export default function DeployReportPage() {
             </>
           )}
 
-          {/* 공유 버튼 */}
+          {/* Share Button */}
           <Card className="mb-8">
             <div className="flex justify-between items-center">
               <div>
-                <h3 className="text-xl font-bold text-gray-800 mb-1">리포트 공유</h3>
-                <p className="text-gray-600 text-sm">팀원과 배포 결과를 공유하세요</p>
+                <h3 className="text-xl font-bold text-gray-800 mb-1">Share Report</h3>
+                <p className="text-gray-600 text-sm">Share deployment results with your team</p>
               </div>
               <Button
                 onClick={() => {
                   navigator.clipboard.writeText(window.location.href);
-                  alert("링크가 복사되었습니다!");
+                  alert("Link copied!");
                 }}
               >
-                📤 링크 복사
+                📤 Copy Link
               </Button>
             </div>
           </Card>
 
-          {/* 추가 액션 버튼들 */}
+          {/* Additional Action Buttons */}
           <div className="flex gap-4 justify-center">
             <Link href={`/project/${projectId}`}>
               <Button size="lg" variant="secondary" className="px-8">
-                프로젝트로 돌아가기
+                Back to Project
               </Button>
             </Link>
             <Link href="/history">
               <Button size="lg" variant="secondary" className="px-8">
-                배포 히스토리 보기
+                View Deployment History
               </Button>
             </Link>
             {!isSuccess && (
               <Link href={`/project/${projectId}/deploy`}>
                 <Button size="lg" className="px-8">
-                  다시 배포하기
+                  Redeploy
                 </Button>
               </Link>
             )}

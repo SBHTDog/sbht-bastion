@@ -2,7 +2,7 @@
 
 // ============================================================================
 // MOCK AUTH CONTEXT
-// 목데이터를 사용한 테스트용 인증 컨텍스트
+// Test authentication context using mock data
 // ============================================================================
 
 import React, { createContext, useContext, useState, useEffect } from "react";
@@ -26,7 +26,7 @@ export function MockAuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // 초기화 시 로컬 스토리지에서 사용자 정보 복원
+  // Restore user information from local storage on initialization
   useEffect(() => {
     const storedUser = localStorage.getItem("mockUser");
     if (storedUser) {
@@ -42,7 +42,7 @@ export function MockAuthProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(false);
   }, []);
 
-  // 로그인 함수
+  // Login function
   const login = async (username: string): Promise<boolean> => {
     debugLog("MockAuthContext", "Login attempt", { username });
 
@@ -63,7 +63,7 @@ export function MockAuthProvider({ children }: { children: React.ReactNode }) {
     return false;
   };
 
-  // 로그아웃 함수
+  // Logout function
   const logout = () => {
     debugLog("MockAuthContext", "Logout");
     setUser(null);

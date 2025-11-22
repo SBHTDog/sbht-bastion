@@ -1,6 +1,6 @@
 // ============================================================================
 // TYPE DEFINITIONS
-// 디버깅을 위한 명확한 타입 정의
+// Clear type definitions for debugging
 // ============================================================================
 
 // ----------------------------------------------------------------------------
@@ -242,7 +242,7 @@ export interface DebugLog {
   data?: any;
 }
 
-// 디버깅 헬퍼
+// Debugging helper
 export const DEBUG_MODE = process.env.NODE_ENV === "development";
 
 export function debugLog(context: string, message: string, data?: any) {

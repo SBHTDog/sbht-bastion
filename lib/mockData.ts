@@ -1,7 +1,7 @@
 // ============================================================================
 // MOCK DATA
-// 전체 애플리케이션에서 사용하는 목 데이터
-// 디버깅을 위해 명확한 구조와 주석 포함
+// Mock data used throughout the application
+// Clear structure and comments for debugging
 // ============================================================================
 
 import {
@@ -27,7 +27,7 @@ import {
 export const mockUsers: User[] = [
   {
     id: "user-1",
-    name: "김철수",
+    name: "Chul-su Kim",
     email: "kim.chulsu@example.com",
     avatar: "https://avatars.githubusercontent.com/u/1",
     githubUsername: "kimcs",
@@ -35,7 +35,7 @@ export const mockUsers: User[] = [
   },
   {
     id: "user-2",
-    name: "이영희",
+    name: "Young-hee Lee",
     email: "lee.younghee@example.com",
     avatar: "https://avatars.githubusercontent.com/u/2",
     githubUsername: "leeyh",
@@ -43,7 +43,7 @@ export const mockUsers: User[] = [
   },
   {
     id: "user-3",
-    name: "박민수",
+    name: "Min-su Park",
     email: "park.minsu@example.com",
     avatar: "https://avatars.githubusercontent.com/u/3",
     githubUsername: "parkms",
@@ -340,11 +340,11 @@ const successCodeDeploy: CodeDeployResult = {
 
 const successLLM: LLMAnalysis = {
   summary:
-    "배포가 성공적으로 완료되었습니다. 모든 테스트가 통과했고, 보안 스캔에서 심각한 취약점이 발견되지 않았습니다.",
+    "Deployment completed successfully. All tests passed and no critical vulnerabilities found in security scan.",
   optimizations: [
-    "빌드 시간을 20% 단축할 수 있는 캐싱 전략 추가 권장",
-    "ECS Task의 CPU를 512로 증가시킨 것은 좋은 결정입니다",
-    "다음 배포부터는 Blue/Green 배포 전략 고려 권장",
+    "Recommend adding caching strategy to reduce build time by 20%",
+    "Increasing ECS Task CPU to 512 was a good decision",
+    "Consider Blue/Green deployment strategy for next deployment",
   ],
   relatedIssues: [],
 };
@@ -455,17 +455,17 @@ const failedNetwork: NetworkDiagnostic = {
 
 const failedLLM: LLMAnalysis = {
   summary:
-    "배포가 Test 단계에서 실패했습니다. 3개의 테스트 케이스가 실패했으며, 주로 비동기 처리와 mock 데이터 관련 문제입니다.",
+    "Deployment failed at Test stage. 3 test cases failed, mainly due to async processing and mock data issues.",
   failureReason:
-    "UserService의 이메일 검증 로직에서 undefined를 반환하는 문제, AuthController의 타임아웃 설정 부족, DatabaseService의 연결 풀 설정 오류가 원인입니다.",
+    "Issues with UserService email validation logic returning undefined, AuthController timeout configuration, and DatabaseService connection pool settings.",
   recommendations: [
-    "UserService.test.ts의 mock 데이터에 email 필드 추가 필요",
-    "AuthController 테스트의 타임아웃을 5초에서 10초로 증가 권장",
-    "DatabaseService의 연결 풀 타임아웃 설정 검토 필요",
-    "Trivy에서 발견된 HIGH 심각도 취약점 3개 즉시 패치 필요 (axios, tough-cookie, word-wrap)",
-    "TypeScript any 타입 사용을 제거하고 명확한 타입 정의 권장",
+    "Need to add email field to mock data in UserService.test.ts",
+    "Recommend increasing AuthController test timeout from 5s to 10s",
+    "Need to review DatabaseService connection pool timeout settings",
+    "Need to immediately patch 3 HIGH severity vulnerabilities found by Trivy (axios, tough-cookie, word-wrap)",
+    "Recommend removing TypeScript any types and using explicit type definitions",
   ],
-  estimatedFixTime: "약 2-3시간 소요 예상",
+  estimatedFixTime: "Estimated fix time: 2-3 hours",
   relatedIssues: [
     "GitHub Issue #234: Email validation returns undefined",
     "GitHub Issue #189: Test timeout configuration",
@@ -569,30 +569,30 @@ export const mockSharedReports: SharedReport[] = [
 ];
 
 // ============================================================================
-// HELPER FUNCTIONS (디버깅용)
+// HELPER FUNCTIONS (for debugging)
 // ============================================================================
 
-// 특정 사용자 찾기
+// Find specific user
 export function findUserById(id: string): User | undefined {
   return mockUsers.find((u) => u.id === id);
 }
 
-// 특정 사용자의 프로젝트들
+// Projects for specific user
 export function getProjectsByUserId(userId: string): Project[] {
   return mockProjects.filter((p) => p.userId === userId);
 }
 
-// 특정 프로젝트의 배포 목록
+// Deployment list for specific project
 export function getDeploymentsByProjectId(projectId: string): Deployment[] {
   return mockDeployments.filter((d) => d.projectId === projectId);
 }
 
-// 배포 상세 정보 가져오기
+// Get deployment details
 export function getDeploymentDetail(deployId: string): DeploymentDetail | undefined {
   return mockDeploymentDetails[deployId];
 }
 
-// GitHub 레포 검색
+// Search GitHub repos
 export function searchRepos(query: string): GitHubRepo[] {
   const lowerQuery = query.toLowerCase();
   return mockGitHubRepos.filter(
