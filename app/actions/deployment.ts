@@ -38,17 +38,54 @@ export async function getWorkflowRunLogs(owner: string, repo: string, runId: num
   const octokit = new Octokit({ auth: token });
 
   try {
-    // Get jobs for the run
+    // Get jobs for the run with steps details
     const { data: jobs } = await octokit.rest.actions.listJobsForWorkflowRun({
       owner,
       repo,
       run_id: runId,
+      filter: 'all',
     });
 
     return jobs.jobs;
   } catch (error) {
     console.error('Failed to fetch workflow logs:', error);
     throw new Error('Failed to fetch logs');
+  }
+}
+
+export async function getWorkflowRunDetails(owner: string, repo: string, runId: number) {
+  const cookieStore = await cookies();
+  const token = cookieStore.get('github_token')?.value;
+
+  if (!token) {
+    throw new Error('Not authenticated');
+  }
+
+  const octokit = new Octokit({ auth: token });
+
+  try {
+    // Get detailed run information
+    const { data: run } = await octokit.rest.actions.getWorkflowRun({
+      owner,
+      repo,
+      run_id: runId,
+    });
+
+    // Get jobs with steps
+    const { data: jobs } = await octokit.rest.actions.listJobsForWorkflowRun({
+      owner,
+      repo,
+      run_id: runId,
+      filter: 'all',
+    });
+
+    return {
+      run,
+      jobs: jobs.jobs,
+    };
+  } catch (error) {
+    console.error('Failed to fetch workflow run details:', error);
+    throw new Error('Failed to fetch run details');
   }
 }
 
@@ -135,6 +172,52 @@ export async function analyzeFailureWithAI(errorLogs: string, jobName: string) {
       summary: 'Failed to analyze with AI',
       rootCauses: [],
       suggestions: [],
+    };
+  }
+}
+
+export async function analyzeSuccessfulDeployment(allLogs: string, runSummary: string) {
+  const apiKey = process.env.OPENAI_API_KEY;
+
+  if (!apiKey) {
+    return {
+      summary: 'OpenAI API key not configured',
+    };
+  }
+
+  try {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: 'gpt-4-turbo-preview',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are a DevOps expert analyzing successful CI/CD deployments. Provide insights on optimization, best practices, and potential improvements.',
+          },
+          {
+            role: 'user',
+            content: `Analyze this successful GitHub Actions deployment:\n\nSummary: ${runSummary}\n\nLogs:\n${allLogs.slice(0, 8000)}\n\nProvide: 1) Overall assessment, 2) Performance observations, 3) Optimization suggestions, 4) Best practice recommendations`,
+          },
+        ],
+        max_tokens: 1500,
+      }),
+    });
+
+    const data = await response.json();
+    const analysis = data.choices[0].message.content;
+
+    return {
+      summary: analysis,
+    };
+  } catch (error) {
+    console.error('OpenAI API error:', error);
+    return {
+      summary: 'Failed to analyze deployment',
     };
   }
 }

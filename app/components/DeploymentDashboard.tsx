@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { getGitHubActionsRuns, getWorkflowRunLogs, getJobLogs, analyzeFailureWithAI } from '../actions/deployment';
+import { getGitHubActionsRuns, getWorkflowRunDetails, getWorkflowRunLogs, getJobLogs, analyzeFailureWithAI, analyzeSuccessfulDeployment } from '../actions/deployment';
 
 interface WorkflowRun {
   id: number;
@@ -38,6 +38,13 @@ export default function DeploymentDashboard() {
   const [lastWebhookEvent, setLastWebhookEvent] = useState<WebhookEvent | null>(null);
   const [sseConnected, setSSEConnected] = useState(false);
   const eventSourceRef = useRef<EventSource | null>(null);
+  
+  // Scoreboard state
+  const [liveRunDetails, setLiveRunDetails] = useState<any>(null);
+  const [scoreboard, setScoreboard] = useState<any[]>([]);
+  const [deploymentAdvice, setDeploymentAdvice] = useState<string | null>(null);
+  const [generatingAdvice, setGeneratingAdvice] = useState(false);
+  const scoreboardIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // Configuration - change these to your repo
   const REPO_OWNER = 'SBHTDog';
@@ -62,10 +69,16 @@ export default function DeploymentDashboard() {
           const data: WebhookEvent = JSON.parse(event.data);
           setLastWebhookEvent(data);
           
-          // If it's a workflow_run or workflow_job event, refresh deployments
-          if (data.event === 'workflow_run' || data.event === 'workflow_job') {
+          // If it's a workflow or check event, refresh deployments
+          if (data.event === 'workflow_run' || data.event === 'workflow_job' || 
+              data.event === 'check_run' || data.event === 'check_suite') {
             console.log('Deployment event received, refreshing...');
             fetchDeployments();
+            
+            // If we're watching a live run, refresh its details
+            if (liveRunDetails) {
+              fetchLiveRunDetails(liveRunDetails.run.id);
+            }
           }
         } catch (error) {
           console.error('Failed to parse SSE message:', error);
@@ -89,8 +102,48 @@ export default function DeploymentDashboard() {
       if (eventSourceRef.current) {
         eventSourceRef.current.close();
       }
+      if (scoreboardIntervalRef.current) {
+        clearInterval(scoreboardIntervalRef.current);
+      }
     };
   }, []);
+
+  // Live scoreboard updates for in-progress runs
+  useEffect(() => {
+    if (runs.length > 0) {
+      const latestRun = runs[0];
+      
+      // If latest run is in progress, start live updates
+      if (latestRun.status === 'in_progress' || latestRun.status === 'queued') {
+        fetchLiveRunDetails(latestRun.id);
+        
+        // Set up interval for live updates every 10 seconds
+        if (scoreboardIntervalRef.current) {
+          clearInterval(scoreboardIntervalRef.current);
+        }
+        
+        scoreboardIntervalRef.current = setInterval(() => {
+          fetchLiveRunDetails(latestRun.id);
+        }, 10000);
+      } else {
+        // Clear interval if run is complete
+        if (scoreboardIntervalRef.current) {
+          clearInterval(scoreboardIntervalRef.current);
+        }
+        
+        // Fetch details once for completed run
+        if (!liveRunDetails || liveRunDetails.run.id !== latestRun.id) {
+          fetchLiveRunDetails(latestRun.id);
+        }
+      }
+    }
+    
+    return () => {
+      if (scoreboardIntervalRef.current) {
+        clearInterval(scoreboardIntervalRef.current);
+      }
+    };
+  }, [runs]);
 
   const fetchDeployments = async () => {
     try {
@@ -100,6 +153,41 @@ export default function DeploymentDashboard() {
       console.error('Failed to fetch deployments:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchLiveRunDetails = async (runId: number) => {
+    try {
+      const details = await getWorkflowRunDetails(REPO_OWNER, REPO_NAME, runId);
+      setLiveRunDetails(details);
+      
+      // Build scoreboard from jobs and steps
+      if (details.jobs && details.jobs.length > 0) {
+        const innings = details.jobs.flatMap((job: any) => {
+          if (!job.steps || job.steps.length === 0) {
+            return [{
+              name: job.name,
+              status: job.status,
+              conclusion: job.conclusion,
+              started_at: job.started_at,
+              completed_at: job.completed_at,
+            }];
+          }
+          
+          return job.steps.map((step: any) => ({
+            name: `${job.name}: ${step.name}`,
+            status: step.status,
+            conclusion: step.conclusion,
+            started_at: step.started_at,
+            completed_at: step.completed_at,
+            number: step.number,
+          }));
+        });
+        
+        setScoreboard(innings);
+      }
+    } catch (error) {
+      console.error('Failed to fetch live run details:', error);
     }
   };
 
@@ -154,6 +242,38 @@ export default function DeploymentDashboard() {
       console.error('Failed to analyze:', error);
     } finally {
       setAnalyzingRun(null);
+    }
+  };
+
+  const handleGenerateDeploymentAdvice = async () => {
+    if (!liveRunDetails) return;
+    
+    setGeneratingAdvice(true);
+    setDeploymentAdvice(null);
+    
+    try {
+      // Collect all logs from all jobs
+      const allLogs = await Promise.all(
+        liveRunDetails.jobs.map(async (job: any) => {
+          try {
+            const logs = await getJobLogs(REPO_OWNER, REPO_NAME, job.id);
+            return `=== ${job.name} ===\n${logs}\n`;
+          } catch (error) {
+            return `=== ${job.name} ===\nFailed to fetch logs\n`;
+          }
+        })
+      );
+      
+      const combinedLogs = allLogs.join('\n\n');
+      const runSummary = `${liveRunDetails.run.name} #${liveRunDetails.run.run_number} - ${liveRunDetails.run.conclusion}`;
+      
+      const advice = await analyzeSuccessfulDeployment(combinedLogs, runSummary);
+      setDeploymentAdvice(advice.summary);
+    } catch (error) {
+      console.error('Failed to generate advice:', error);
+      setDeploymentAdvice('Failed to generate deployment advice');
+    } finally {
+      setGeneratingAdvice(false);
     }
   };
 
@@ -243,8 +363,55 @@ export default function DeploymentDashboard() {
               </div>
             </div>
 
+            {/* Baseball Innings - Live Progress */}
+            {scoreboard.length > 0 && (
+              <div className="mb-6 bg-gray-800/30 rounded-xl p-6 border-2 border-yellow-500">
+                <div className="text-yellow-300 font-bold text-center mb-4">⚾ INNINGS (STEPS) ⚾</div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-96 overflow-y-auto">
+                  {scoreboard.map((inning, index) => (
+                    <div 
+                      key={index}
+                      className={`p-3 rounded-lg border-2 ${
+                        inning.status === 'completed' && inning.conclusion === 'success' ? 'bg-green-900/30 border-green-500' :
+                        inning.status === 'completed' && inning.conclusion === 'failure' ? 'bg-red-900/30 border-red-500' :
+                        inning.status === 'in_progress' ? 'bg-yellow-900/30 border-yellow-500 animate-pulse' :
+                        'bg-gray-800/30 border-gray-600'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-white text-xs font-bold">
+                          {index + 1}회 {index % 2 === 0 ? '초' : '말'}
+                        </span>
+                        <span className="text-xs">
+                          {inning.status === 'completed' && inning.conclusion === 'success' && '✓'}
+                          {inning.status === 'completed' && inning.conclusion === 'failure' && '✗'}
+                          {inning.status === 'in_progress' && '⏳'}
+                          {inning.status === 'queued' && '⏸'}
+                        </span>
+                      </div>
+                      <div className="text-gray-300 text-xs mt-1 truncate" title={inning.name}>
+                        {inning.name}
+                      </div>
+                      {inning.completed_at && inning.started_at && (
+                        <div className="text-gray-500 text-xs mt-1">
+                          {Math.round((new Date(inning.completed_at).getTime() - new Date(inning.started_at).getTime()) / 1000)}s
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                
+                {/* Live Update Indicator */}
+                {latestRun.status === 'in_progress' && (
+                  <div className="text-center mt-4 text-yellow-400 text-sm animate-pulse">
+                    🔴 LIVE • Updating every 10 seconds
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Scoreboard Stats */}
-            <div className="grid grid-cols-3 gap-6">
+            <div className="grid grid-cols-3 gap-6 mb-6">
               <div className="bg-gray-800/50 rounded-xl p-6 text-center border-2 border-green-500">
                 <div className="text-green-400 text-4xl font-bold mb-2">{successCount}</div>
                 <div className="text-gray-400 text-sm font-semibold">WINS</div>
@@ -258,6 +425,42 @@ export default function DeploymentDashboard() {
                 <div className="text-gray-400 text-sm font-semibold">LOSSES</div>
               </div>
             </div>
+
+            {/* AI Deployment Advice - Only for successful deployments */}
+            {latestRun.conclusion === 'success' && liveRunDetails && (
+              <div className="bg-purple-900/30 border-2 border-purple-500 rounded-xl p-6">
+                <div className="text-center mb-4">
+                  <h3 className="text-purple-300 font-bold text-lg mb-2">🤖 AI Deployment Analysis</h3>
+                  <p className="text-gray-400 text-sm mb-4">
+                    Get AI-powered insights and optimization suggestions for this deployment
+                  </p>
+                  
+                  {!deploymentAdvice && !generatingAdvice && (
+                    <button
+                      onClick={handleGenerateDeploymentAdvice}
+                      className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-bold"
+                    >
+                      🧠 Generate Deployment Advice
+                    </button>
+                  )}
+                  
+                  {generatingAdvice && (
+                    <div className="flex items-center justify-center gap-3">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-400"></div>
+                      <span className="text-purple-300">Analyzing deployment logs with AI...</span>
+                    </div>
+                  )}
+                </div>
+                
+                {deploymentAdvice && (
+                  <div className="bg-white/10 rounded-lg p-6 mt-4">
+                    <div className="text-white whitespace-pre-wrap text-sm">
+                      {deploymentAdvice}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
 
