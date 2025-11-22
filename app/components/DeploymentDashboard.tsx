@@ -55,6 +55,7 @@ export default function DeploymentDashboard() {
   const scoreboardIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const logUpdateIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const [trivyScanResults, setTrivyScanResults] = useState<string | null>(null);
+  const [loadingTrivy, setLoadingTrivy] = useState(false);
 
   // Configuration - change these to your repo
   const REPO_OWNER = 'SBHTDog';
@@ -117,6 +118,14 @@ export default function DeploymentDashboard() {
       }
     };
   }, []);
+
+  // Auto-extract Trivy results when deployment succeeds
+  useEffect(() => {
+    const latestRun = runs[0];
+    if (liveRunDetails && latestRun?.conclusion === 'success' && !loadingTrivy && !trivyScanResults) {
+      extractTrivyScanResults();
+    }
+  }, [liveRunDetails, runs]);
 
   // Live scoreboard updates for in-progress runs
   useEffect(() => {
@@ -294,6 +303,50 @@ export default function DeploymentDashboard() {
     }
   };
 
+  const extractTrivyScanResults = async () => {
+    if (!liveRunDetails) return;
+    
+    setLoadingTrivy(true);
+    
+    try {
+      // Collect all logs from all jobs
+      const allLogs = await Promise.all(
+        liveRunDetails.jobs.map(async (job: any) => {
+          try {
+            const logs = await getJobLogs(REPO_OWNER, REPO_NAME, job.id);
+            return logs;
+          } catch (error) {
+            return '';
+          }
+        })
+      );
+      
+      const combinedLogs = allLogs.join('\n\n');
+      
+      // Find the summary table section (after "Total: X (HIGH: Y, CRITICAL: Z)" and before whole node_modules scan)
+      // Pattern: Look for the Total line, then capture the table, but stop before duplicate tables
+      const trivySectionRegex = /Total: \d+ \([^)]+\)[\s\S]*?(┌[─┬]+┐[\s\S]*?└[─┴]+┘)/;
+      const match = combinedLogs.match(trivySectionRegex);
+      
+      if (match && match[0]) {
+        // Extract just the Total line and the first table (summary, not whole node_modules)
+        const fullMatch = match[0];
+        
+        // Remove timestamps (format: 2025-11-22T05:53:05.7084267Z)
+        const cleanedTrivy = fullMatch.replace(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+Z\s*/gm, '');
+        
+        setTrivyScanResults(cleanedTrivy);
+      } else {
+        setTrivyScanResults(null);
+      }
+    } catch (error) {
+      console.error('Failed to extract Trivy results:', error);
+      setTrivyScanResults(null);
+    } finally {
+      setLoadingTrivy(false);
+    }
+  };
+
   const handleGenerateDeploymentAdvice = async () => {
     if (!liveRunDetails) return;
     
@@ -315,20 +368,6 @@ export default function DeploymentDashboard() {
       
       const combinedLogs = allLogs.join('\n\n');
       const runSummary = `${liveRunDetails.run.name} #${liveRunDetails.run.run_number} - ${liveRunDetails.run.conclusion}`;
-      
-      // Extract Trivy scan results
-      const trivyRegex = /┌[─┬]+┐[\s\S]*?└[─┴]+┘/g;
-      const trivyMatches = combinedLogs.match(trivyRegex);
-      
-      if (trivyMatches && trivyMatches.length > 0) {
-        // Remove timestamps (format: 2025-11-22T05:53:05.7084267Z)
-        const cleanedTrivy = trivyMatches.map(match => 
-          match.replace(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+Z\s*/gm, '')
-        ).join('\n\n');
-        setTrivyScanResults(cleanedTrivy);
-      } else {
-        setTrivyScanResults(null);
-      }
       
       const advice = await analyzeSuccessfulDeployment(combinedLogs, runSummary);
       setDeploymentAdvice(advice.summary);
@@ -633,18 +672,21 @@ export default function DeploymentDashboard() {
                     </p>
                   </div>
                   
-                  {trivyScanResults ? (
+                  {loadingTrivy ? (
+                    <div className="flex items-center justify-center gap-3">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-400"></div>
+                      <span className="text-red-300">Extracting security scan results...</span>
+                    </div>
+                  ) : trivyScanResults ? (
                     <div className="bg-white/10 rounded-lg p-4 overflow-x-auto">
                       <pre className="text-white text-xs font-mono whitespace-pre">
                         {trivyScanResults}
                       </pre>
                     </div>
                   ) : (
-                    deploymentAdvice && (
-                      <div className="text-center text-gray-400 text-sm">
-                        No security vulnerabilities detected in scan results
-                      </div>
-                    )
+                    <div className="text-center text-gray-400 text-sm">
+                      ✓ No security vulnerabilities detected in scan results
+                    </div>
                   )}
                 </div>
               </div>
