@@ -216,7 +216,7 @@ export async function analyzeSuccessfulDeployment(allLogs: string, runSummary: s
           },
           {
             role: 'user',
-            content: `Analyze this successful GitHub Actions deployment:\n\nSummary: ${runSummary}\n\nLogs:\n${allLogs.slice(0, 8000)}\n\nProvide: 1) Overall assessment, 2) Performance observations, 3) Optimization suggestions, 4) Best practice recommendations. Do not insert any further question in the response.`,
+            content: `Analyze this successful GitHub Actions deployment:\n\nSummary: ${runSummary}\n\nLogs:\n${allLogs}\n\nProvide: 1) Overall assessment, 2) Performance observations, 3) Optimization suggestions, 4) Best practice recommendations. Do not insert any further question in the response.`,
           },
         ],
       }),

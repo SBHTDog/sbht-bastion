@@ -294,6 +294,7 @@ export default function DeploymentDashboard() {
   const handleAnalyzeFailure = async (runId: number, jobName: string, logs: string) => {
     setAnalyzingRun(runId);
     try {
+      console.log('FAILED log: ',logs);
       const analysis = await analyzeFailureWithAI(logs, jobName);
       setAiAnalysis(analysis);
     } catch (error) {
@@ -849,9 +850,6 @@ export default function DeploymentDashboard() {
                         <div className="bg-purple-50 border-2 border-purple-300 rounded-xl p-6">
                           <h4 className="text-2xl font-bold text-purple-900 mb-4 flex items-center gap-2">
                             🤖 AI Failure Analysis
-                            <span className="text-sm font-normal text-purple-600">
-                              (Confidence: {aiAnalysis.confidence}%)
-                            </span>
                           </h4>
                           <div className="bg-white rounded-lg p-4 text-gray-800 whitespace-pre-wrap">
                             {aiAnalysis.summary}
