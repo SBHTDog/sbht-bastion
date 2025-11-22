@@ -1,51 +1,39 @@
-import Image from "next/image";
+import { checkAuthentication } from './dashboard/github/actions';
+import DeploymentDashboard from './components/DeploymentDashboard';
+import Link from 'next/link';
 
-export default function Home() {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <div className="w-full">
-          <h1 className="text-4xl font-bold mb-2">SBHT Bastion</h1>
-          <p className="text-gray-600 dark:text-gray-400 mb-8">
-            GitHub App Integration Platform
-          </p>
-        </div>
+export default async function Home() {
+  const { authenticated } = await checkAuthentication();
 
-        <div className="flex flex-col gap-6 w-full">
-          <div className="border border-gray-200 dark:border-gray-800 rounded-lg p-6">
-            <h2 className="text-xl font-semibold mb-2">GitHub Dashboard</h2>
-            <p className="text-gray-600 dark:text-gray-400 mb-4">
-              View your GitHub profile, repositories, and organizations
+  if (!authenticated) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full border-2 border-blue-100">
+          <div className="text-center mb-6">
+            <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              SBHT Bastion
+            </h1>
+            <p className="text-xl text-gray-600 mb-4">Deployment Dashboard</p>
+          </div>
+          
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+            <p className="text-gray-700 text-center">
+              🔐 Connect your GitHub account to access the deployment monitoring dashboard
             </p>
-            <a
-              href="/dashboard/github"
-              className="inline-block bg-gray-900 text-white px-6 py-2 rounded-lg hover:bg-gray-800 transition"
-            >
-              Open Dashboard
-            </a>
           </div>
 
-          <div className="border border-gray-200 dark:border-gray-800 rounded-lg p-6">
-            <h2 className="text-xl font-semibold mb-2">Webhook Monitor</h2>
-            <p className="text-gray-600 dark:text-gray-400 mb-4">
-              Real-time GitHub webhook events via Server-Sent Events
-            </p>
-            <a
-              href="/webhooks/monitor"
-              className="inline-block bg-gray-900 text-white px-6 py-2 rounded-lg hover:bg-gray-800 transition"
-            >
-              Open Monitor
-            </a>
-          </div>
-        </div>
+          <a
+            href="/auth/github/login"
+            className="block w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white text-center py-3 px-4 rounded-lg hover:from-blue-700 hover:to-purple-700 transition font-semibold text-lg"
+          >
+            Login with GitHub
+          </a>
 
-        <div className="flex flex-col gap-2 text-sm text-gray-500 dark:text-gray-500">
-          <p>API Endpoints:</p>
-          <code className="text-xs">POST /api/webhooks/github</code>
-          <code className="text-xs">GET /api/webhooks/events (SSE)</code>
-          <code className="text-xs">GET /api/github</code>
+          
         </div>
-      </main>
-    </div>
-  );
+      </div>
+    );
+  }
+
+  return <DeploymentDashboard />;
 }

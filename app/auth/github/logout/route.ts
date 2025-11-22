@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
   const baseUrl = process.env.PUBLIC_URL || 
                   (forwardedHost ? `${forwardedProto}://${forwardedHost}` : request.nextUrl.origin);
   
-  const response = NextResponse.redirect(new URL('/dashboard/github', baseUrl));
+  const response = NextResponse.redirect(new URL('/', baseUrl));
 
   // Clear GitHub token cookies
   response.cookies.delete('github_token');

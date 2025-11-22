@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
     const baseUrl = process.env.PUBLIC_URL || 
                     (forwardedHost ? `${forwardedProto}://${forwardedHost}` : request.nextUrl.origin);
     
-    const response = NextResponse.redirect(new URL('/dashboard/github', baseUrl));
+    const response = NextResponse.redirect(new URL('/', baseUrl));
 
     // Store token in HttpOnly cookie
     const isSecure = process.env.COOKIE_SECURE !== 'false';
