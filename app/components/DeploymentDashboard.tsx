@@ -75,13 +75,8 @@ export default function DeploymentDashboard() {
           // If it's a workflow or check event, refresh deployments
           if (data.event === 'workflow_run' || data.event === 'workflow_job' || 
               data.event === 'check_run' || data.event === 'check_suite') {
-            console.log('Deployment event received, refreshing...');
+            console.log('Deployment event received, refreshing...', data.event);
             fetchDeployments();
-            
-            // If we're watching a live run, refresh its details
-            if (liveRunDetails) {
-              fetchLiveRunDetails(liveRunDetails.run.id);
-            }
           }
         } catch (error) {
           console.error('Failed to parse SSE message:', error);
@@ -119,10 +114,11 @@ export default function DeploymentDashboard() {
     if (runs.length > 0) {
       const latestRun = runs[0];
       
-      // If latest run is in progress, start live updates
+      // Always fetch details when runs change
+      fetchLiveRunDetails(latestRun.id);
+      
+      // If latest run is in progress or queued, start live updates
       if (latestRun.status === 'in_progress' || latestRun.status === 'queued') {
-        fetchLiveRunDetails(latestRun.id);
-        
         // Set up interval for live updates every 10 seconds
         if (scoreboardIntervalRef.current) {
           clearInterval(scoreboardIntervalRef.current);
@@ -147,11 +143,6 @@ export default function DeploymentDashboard() {
         }
         if (logUpdateIntervalRef.current) {
           clearInterval(logUpdateIntervalRef.current);
-        }
-        
-        // Fetch details once for completed run
-        if (!liveRunDetails || liveRunDetails.run.id !== latestRun.id) {
-          fetchLiveRunDetails(latestRun.id);
         }
       }
     }
@@ -454,7 +445,7 @@ export default function DeploymentDashboard() {
                               </div>
                               {topInning && (
                                 <div className="text-xs mt-1 truncate" title={topInning.name}>
-                                  {topInning.name}
+                                  {topInning.name.split(":")[1]?.trim() || topInning.name}
                                 </div>
                               )}
                             </td>
@@ -485,7 +476,7 @@ export default function DeploymentDashboard() {
                               </div>
                               {bottomInning && (
                                 <div className="text-xs mt-1 truncate" title={bottomInning.name}>
-                                  {bottomInning.name.substring(0, 10)}
+                                  {bottomInning.name.split(":")[1]?.trim() || bottomInning.name}
                                 </div>
                               )}
                             </td>
