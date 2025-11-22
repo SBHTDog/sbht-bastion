@@ -44,7 +44,10 @@ export default function DeploymentDashboard() {
   const [scoreboard, setScoreboard] = useState<any[]>([]);
   const [deploymentAdvice, setDeploymentAdvice] = useState<string | null>(null);
   const [generatingAdvice, setGeneratingAdvice] = useState(false);
+  const [liveJobLogs, setLiveJobLogs] = useState<{[key: number]: string}>({});
+  const [expandedLiveJob, setExpandedLiveJob] = useState<number | null>(null);
   const scoreboardIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const logUpdateIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // Configuration - change these to your repo
   const REPO_OWNER = 'SBHTDog';
@@ -105,6 +108,9 @@ export default function DeploymentDashboard() {
       if (scoreboardIntervalRef.current) {
         clearInterval(scoreboardIntervalRef.current);
       }
+      if (logUpdateIntervalRef.current) {
+        clearInterval(logUpdateIntervalRef.current);
+      }
     };
   }, []);
 
@@ -125,10 +131,22 @@ export default function DeploymentDashboard() {
         scoreboardIntervalRef.current = setInterval(() => {
           fetchLiveRunDetails(latestRun.id);
         }, 10000);
+
+        // Set up interval for live log updates every 5 seconds
+        if (logUpdateIntervalRef.current) {
+          clearInterval(logUpdateIntervalRef.current);
+        }
+        
+        logUpdateIntervalRef.current = setInterval(() => {
+          updateLiveLogs(latestRun.id);
+        }, 5000);
       } else {
-        // Clear interval if run is complete
+        // Clear intervals if run is complete
         if (scoreboardIntervalRef.current) {
           clearInterval(scoreboardIntervalRef.current);
+        }
+        if (logUpdateIntervalRef.current) {
+          clearInterval(logUpdateIntervalRef.current);
         }
         
         // Fetch details once for completed run
@@ -141,6 +159,9 @@ export default function DeploymentDashboard() {
     return () => {
       if (scoreboardIntervalRef.current) {
         clearInterval(scoreboardIntervalRef.current);
+      }
+      if (logUpdateIntervalRef.current) {
+        clearInterval(logUpdateIntervalRef.current);
       }
     };
   }, [runs]);
@@ -189,6 +210,34 @@ export default function DeploymentDashboard() {
     } catch (error) {
       console.error('Failed to fetch live run details:', error);
     }
+  };
+
+  const updateLiveLogs = async (runId: number) => {
+    if (!liveRunDetails || !liveRunDetails.jobs) return;
+    
+    try {
+      // Fetch logs for all in-progress or recently completed jobs
+      const jobsToUpdate = liveRunDetails.jobs.filter((job: any) => 
+        job.status === 'in_progress' || job.status === 'queued' ||
+        (job.status === 'completed' && !liveJobLogs[job.id])
+      );
+
+      for (const job of jobsToUpdate) {
+        try {
+          const logs = await getJobLogs(REPO_OWNER, REPO_NAME, job.id);
+          setLiveJobLogs(prev => ({ ...prev, [job.id]: logs }));
+        } catch (error) {
+          // Skip jobs that don't have logs yet
+          console.debug(`Logs not available yet for job ${job.id}`);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to update live logs:', error);
+    }
+  };
+
+  const handleToggleLiveJobLog = (jobId: number) => {
+    setExpandedLiveJob(expandedLiveJob === jobId ? null : jobId);
   };
 
   const handleToggleExpand = async (runId: number) => {
@@ -367,38 +416,53 @@ export default function DeploymentDashboard() {
             {scoreboard.length > 0 && (
               <div className="mb-6 bg-gray-800/30 rounded-xl p-6 border-2 border-yellow-500">
                 <div className="text-yellow-300 font-bold text-center mb-4">⚾ INNINGS (STEPS) ⚾</div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-96 overflow-y-auto">
-                  {scoreboard.map((inning, index) => (
-                    <div 
-                      key={index}
-                      className={`p-3 rounded-lg border-2 ${
-                        inning.status === 'completed' && inning.conclusion === 'success' ? 'bg-green-900/30 border-green-500' :
-                        inning.status === 'completed' && inning.conclusion === 'failure' ? 'bg-red-900/30 border-red-500' :
-                        inning.status === 'in_progress' ? 'bg-yellow-900/30 border-yellow-500 animate-pulse' :
-                        'bg-gray-800/30 border-gray-600'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="text-white text-xs font-bold">
-                          {index + 1}회 {index % 2 === 0 ? '초' : '말'}
-                        </span>
-                        <span className="text-xs">
-                          {inning.status === 'completed' && inning.conclusion === 'success' && '✓'}
-                          {inning.status === 'completed' && inning.conclusion === 'failure' && '✗'}
-                          {inning.status === 'in_progress' && '⏳'}
-                          {inning.status === 'queued' && '⏸'}
-                        </span>
-                      </div>
-                      <div className="text-gray-300 text-xs mt-1 truncate" title={inning.name}>
-                        {inning.name}
-                      </div>
-                      {inning.completed_at && inning.started_at && (
-                        <div className="text-gray-500 text-xs mt-1">
-                          {Math.round((new Date(inning.completed_at).getTime() - new Date(inning.started_at).getTime()) / 1000)}s
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7 gap-3 max-h-96 overflow-y-auto">
+                  {scoreboard.map((inning, index) => {
+                    const inningNumber = Math.floor(index / 2) + 1;
+                    const isTop = index % 2 === 0;
+                    
+                    return (
+                      <div 
+                        key={index}
+                        className={`p-3 rounded-lg border-2 ${
+                          inning.status === 'completed' && inning.conclusion === 'success' ? 'bg-green-900/30 border-green-500' :
+                          inning.status === 'completed' && inning.conclusion === 'failure' ? 'bg-red-900/30 border-red-500' :
+                          inning.status === 'in_progress' ? 'bg-yellow-900/30 border-yellow-500 animate-pulse' :
+                          'bg-gray-800/30 border-gray-600'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-white text-sm font-bold">
+                            {inningNumber}
+                          </span>
+                          <span className="text-xs">
+                            {inning.status === 'completed' && inning.conclusion === 'success' && '✓'}
+                            {inning.status === 'completed' && inning.conclusion === 'failure' && '✗'}
+                            {inning.status === 'in_progress' && '⏳'}
+                            {inning.status === 'queued' && '⏸'}
+                          </span>
                         </div>
-                      )}
-                    </div>
-                  ))}
+                        <div className="text-center mb-1">
+                          <span className={`inline-block px-2 py-1 rounded text-xs font-bold ${
+                            inning.status === 'completed' && inning.conclusion === 'success' ? 'bg-green-600 text-white' :
+                            inning.status === 'completed' && inning.conclusion === 'failure' ? 'bg-red-600 text-white' :
+                            inning.status === 'in_progress' ? 'bg-yellow-600 text-white' :
+                            'bg-gray-600 text-white'
+                          }`}>
+                            {isTop ? '초' : '말'}
+                          </span>
+                        </div>
+                        <div className="text-gray-300 text-xs truncate text-center" title={inning.name}>
+                          {inning.name.length > 20 ? inning.name.substring(0, 20) + '...' : inning.name}
+                        </div>
+                        {inning.completed_at && inning.started_at && (
+                          <div className="text-gray-500 text-xs mt-1 text-center">
+                            {Math.round((new Date(inning.completed_at).getTime() - new Date(inning.started_at).getTime()) / 1000)}s
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
                 
                 {/* Live Update Indicator */}
@@ -425,6 +489,64 @@ export default function DeploymentDashboard() {
                 <div className="text-gray-400 text-sm font-semibold">LOSSES</div>
               </div>
             </div>
+
+            {/* Live Logs Section - Only for in-progress runs */}
+            {latestRun.status === 'in_progress' && liveRunDetails && liveRunDetails.jobs && (
+              <div className="mb-6 bg-gray-800/30 rounded-xl p-6 border-2 border-blue-500">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-blue-300 font-bold text-lg">📡 Live Deployment Logs</h3>
+                  <span className="text-blue-400 text-sm animate-pulse">🔴 Updating every 5s</span>
+                </div>
+                <div className="space-y-3 max-h-96 overflow-y-auto">
+                  {liveRunDetails.jobs.map((job: any) => (
+                    <div key={job.id} className="bg-gray-900/50 rounded-lg border border-gray-700">
+                      <div 
+                        className="p-4 cursor-pointer hover:bg-gray-800/50 transition-colors"
+                        onClick={() => handleToggleLiveJobLog(job.id)}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <span className="font-bold text-white">{job.name}</span>
+                            <span className={`px-2 py-1 rounded text-xs font-bold ${
+                              job.status === 'in_progress' ? 'bg-yellow-500 text-white animate-pulse' :
+                              job.status === 'completed' && job.conclusion === 'success' ? 'bg-green-500 text-white' :
+                              job.status === 'completed' && job.conclusion === 'failure' ? 'bg-red-500 text-white' :
+                              'bg-gray-500 text-white'
+                            }`}>
+                              {job.status === 'in_progress' ? '🔄 Running' : 
+                               job.conclusion === 'success' ? '✓ Success' :
+                               job.conclusion === 'failure' ? '✗ Failed' :
+                               job.status}
+                            </span>
+                          </div>
+                          <span className="text-gray-400">
+                            {expandedLiveJob === job.id ? '▼' : '▶'}
+                          </span>
+                        </div>
+                      </div>
+                      
+                      {expandedLiveJob === job.id && (
+                        <div className="border-t border-gray-700 p-4">
+                          {liveJobLogs[job.id] ? (
+                            <div className="bg-black rounded-lg p-4 overflow-x-auto">
+                              <pre className="text-green-400 text-xs font-mono whitespace-pre-wrap max-h-80 overflow-y-auto">
+                                {liveJobLogs[job.id]}
+                              </pre>
+                            </div>
+                          ) : (
+                            <div className="text-center py-4 text-gray-500">
+                              {job.status === 'queued' ? 'Job queued, waiting to start...' :
+                               job.status === 'in_progress' ? 'Loading logs...' :
+                               'No logs available'}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* AI Deployment Advice - Only for successful deployments */}
             {latestRun.conclusion === 'success' && liveRunDetails && (
