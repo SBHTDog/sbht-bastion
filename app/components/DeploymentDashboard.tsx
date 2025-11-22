@@ -454,7 +454,7 @@ export default function DeploymentDashboard() {
                               </div>
                               {topInning && (
                                 <div className="text-xs mt-1 truncate" title={topInning.name}>
-                                  {topInning.name.split(':')[1] || topInning.name.substring(0, 10)}
+                                  {topInning.name}
                                 </div>
                               )}
                             </td>

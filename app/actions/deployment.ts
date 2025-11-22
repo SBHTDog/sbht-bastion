@@ -213,6 +213,7 @@ export async function analyzeSuccessfulDeployment(allLogs: string, runSummary: s
     const data = await response.json();
     console.log('OpenAI response data:', data);
     const analysis = data.choices[0].message.content;
+    console.log(analysis);
 
     return {
       summary: analysis,
