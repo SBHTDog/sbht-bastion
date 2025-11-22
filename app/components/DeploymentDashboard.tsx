@@ -54,6 +54,7 @@ export default function DeploymentDashboard() {
   const [expandedLiveJob, setExpandedLiveJob] = useState<number | null>(null);
   const scoreboardIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const logUpdateIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const [trivyScanResults, setTrivyScanResults] = useState<string | null>(null);
 
   // Configuration - change these to your repo
   const REPO_OWNER = 'SBHTDog';
@@ -315,6 +316,20 @@ export default function DeploymentDashboard() {
       const combinedLogs = allLogs.join('\n\n');
       const runSummary = `${liveRunDetails.run.name} #${liveRunDetails.run.run_number} - ${liveRunDetails.run.conclusion}`;
       
+      // Extract Trivy scan results
+      const trivyRegex = /┌[─┬]+┐[\s\S]*?└[─┴]+┘/g;
+      const trivyMatches = combinedLogs.match(trivyRegex);
+      
+      if (trivyMatches && trivyMatches.length > 0) {
+        // Remove timestamps (format: 2025-11-22T05:53:05.7084267Z)
+        const cleanedTrivy = trivyMatches.map(match => 
+          match.replace(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+Z\s*/gm, '')
+        ).join('\n\n');
+        setTrivyScanResults(cleanedTrivy);
+      } else {
+        setTrivyScanResults(null);
+      }
+      
       const advice = await analyzeSuccessfulDeployment(combinedLogs, runSummary);
       setDeploymentAdvice(advice.summary);
     } catch (error) {
@@ -572,39 +587,66 @@ export default function DeploymentDashboard() {
               </div>
             )} */}
 
-            {/* AI Deployment Advice - Only for successful deployments */}
+            {/* AI Deployment Advice & Security Scan - Only for successful deployments */}
             {latestRun.conclusion === 'success' && liveRunDetails && (
-              <div className="bg-purple-900/30 border-2 border-purple-500 rounded-xl p-6">
-                <div className="text-center mb-4">
-                  <h3 className="text-purple-300 font-bold text-lg mb-2">🤖 AI Deployment Analysis</h3>
-                  <p className="text-gray-400 text-sm mb-4">
-                    Get AI-powered insights and optimization suggestions for this deployment
-                  </p>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* AI Deployment Advice */}
+                <div className="bg-purple-900/30 border-2 border-purple-500 rounded-xl p-6">
+                  <div className="text-center mb-4">
+                    <h3 className="text-purple-300 font-bold text-lg mb-2">🤖 AI Deployment Analysis</h3>
+                    <p className="text-gray-400 text-sm mb-4">
+                      Get AI-powered insights and optimization suggestions for this deployment
+                    </p>
+                    
+                    {!deploymentAdvice && !generatingAdvice && (
+                      <button
+                        onClick={handleGenerateDeploymentAdvice}
+                        className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-bold"
+                      >
+                        🧠 Generate Deployment Advice
+                      </button>
+                    )}
+                    
+                    {generatingAdvice && (
+                      <div className="flex items-center justify-center gap-3">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-400"></div>
+                        <span className="text-purple-300">Analyzing deployment logs with AI...</span>
+                      </div>
+                    )}
+                  </div>
                   
-                  {!deploymentAdvice && !generatingAdvice && (
-                    <button
-                      onClick={handleGenerateDeploymentAdvice}
-                      className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-bold"
-                    >
-                      🧠 Generate Deployment Advice
-                    </button>
-                  )}
-                  
-                  {generatingAdvice && (
-                    <div className="flex items-center justify-center gap-3">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-400"></div>
-                      <span className="text-purple-300">Analyzing deployment logs with AI...</span>
+                  {deploymentAdvice && (
+                    <div className="bg-white/10 rounded-lg p-6 mt-4">
+                      <div className="text-white whitespace-pre-wrap text-sm">
+                        {deploymentAdvice}
+                      </div>
                     </div>
                   )}
                 </div>
-                
-                {deploymentAdvice && (
-                  <div className="bg-white/10 rounded-lg p-6 mt-4">
-                    <div className="text-white whitespace-pre-wrap text-sm">
-                      {deploymentAdvice}
-                    </div>
+
+                {/* Trivy Security Scan Results */}
+                <div className="bg-red-900/30 border-2 border-red-500 rounded-xl p-6">
+                  <div className="text-center mb-4">
+                    <h3 className="text-red-300 font-bold text-lg mb-2">🛡️ Security Scan Results</h3>
+                    <p className="text-gray-400 text-sm mb-4">
+                      Trivy vulnerability scan findings from this deployment
+                    </p>
                   </div>
-                )}
+                  
+                  {trivyScanResults ? (
+                    <div className="bg-white/10 rounded-lg p-4 overflow-x-auto">
+                      <pre className="text-white text-xs font-mono whitespace-pre">
+                        {trivyScanResults}
+                      </pre>
+                    </div>
+                  ) : (
+                    deploymentAdvice && (
+                      <div className="text-center text-gray-400 text-sm">
+                        No security vulnerabilities detected in scan results
+                      </div>
+                    )
+                  )}
+                </div>
               </div>
             )}
           </div>
