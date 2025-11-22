@@ -679,7 +679,7 @@ export default function DeploymentDashboard() {
                     </div>
                   ) : trivyScanResults ? (
                     <div className="bg-white/10 rounded-lg p-4 overflow-x-auto">
-                      <pre className="text-white text-xs font-mono whitespace-pre">
+                      <pre className="text-white text-xs whitespace-pre">
                         {trivyScanResults}
                       </pre>
                     </div>
