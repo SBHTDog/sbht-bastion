@@ -416,53 +416,89 @@ export default function DeploymentDashboard() {
             {scoreboard.length > 0 && (
               <div className="mb-6 bg-gray-800/30 rounded-xl p-6 border-2 border-yellow-500">
                 <div className="text-yellow-300 font-bold text-center mb-4">⚾ INNINGS (STEPS) ⚾</div>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7 gap-3 max-h-96 overflow-y-auto">
-                  {scoreboard.map((inning, index) => {
-                    const inningNumber = Math.floor(index / 2) + 1;
-                    const isTop = index % 2 === 0;
-                    
-                    return (
-                      <div 
-                        key={index}
-                        className={`p-3 rounded-lg border-2 ${
-                          inning.status === 'completed' && inning.conclusion === 'success' ? 'bg-green-900/30 border-green-500' :
-                          inning.status === 'completed' && inning.conclusion === 'failure' ? 'bg-red-900/30 border-red-500' :
-                          inning.status === 'in_progress' ? 'bg-yellow-900/30 border-yellow-500 animate-pulse' :
-                          'bg-gray-800/30 border-gray-600'
-                        }`}
-                      >
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-white text-sm font-bold">
-                            {inningNumber}
-                          </span>
-                          <span className="text-xs">
-                            {inning.status === 'completed' && inning.conclusion === 'success' && '✓'}
-                            {inning.status === 'completed' && inning.conclusion === 'failure' && '✗'}
-                            {inning.status === 'in_progress' && '⏳'}
-                            {inning.status === 'queued' && '⏸'}
-                          </span>
-                        </div>
-                        <div className="text-center mb-1">
-                          <span className={`inline-block px-2 py-1 rounded text-xs font-bold ${
-                            inning.status === 'completed' && inning.conclusion === 'success' ? 'bg-green-600 text-white' :
-                            inning.status === 'completed' && inning.conclusion === 'failure' ? 'bg-red-600 text-white' :
-                            inning.status === 'in_progress' ? 'bg-yellow-600 text-white' :
-                            'bg-gray-600 text-white'
-                          }`}>
-                            {isTop ? '초' : '말'}
-                          </span>
-                        </div>
-                        <div className="text-gray-300 text-xs truncate text-center" title={inning.name}>
-                          {inning.name.length > 20 ? inning.name.substring(0, 20) + '...' : inning.name}
-                        </div>
-                        {inning.completed_at && inning.started_at && (
-                          <div className="text-gray-500 text-xs mt-1 text-center">
-                            {Math.round((new Date(inning.completed_at).getTime() - new Date(inning.started_at).getTime()) / 1000)}s
+                
+                {/* Baseball Scoreboard Table */}
+                <div className="overflow-x-auto">
+                  <table className="w-full border-2 border-white text-white">
+                    <thead>
+                      <tr className="bg-red-600">
+                        <th className="border-2 border-white p-2 text-left font-bold text-sm">TEAM</th>
+                        {Array.from({ length: Math.ceil(scoreboard.length / 2) }, (_, i) => (
+                          <th key={i} className="border-2 border-white p-2 text-center font-bold text-lg min-w-[60px]">
+                            {i + 1}
+                          </th>
+                        ))}
+                        <th className="border-2 border-white p-2 text-center font-bold text-sm bg-red-700">RUNS</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {/* GUEST Row (초 - Top of innings) */}
+                      <tr className="bg-gray-900">
+                        <td className="border-2 border-white p-3 font-bold text-lg">GUEST<br/><span className="text-sm text-gray-400">(초)</span></td>
+                        {Array.from({ length: Math.ceil(scoreboard.length / 2) }, (_, inningNum) => {
+                          const topInning = scoreboard[inningNum * 2];
+                          return (
+                            <td key={inningNum} className={`border-2 border-white p-2 text-center ${
+                              topInning?.status === 'in_progress' ? 'bg-yellow-500 animate-pulse' :
+                              topInning?.conclusion === 'success' ? 'bg-green-600' :
+                              topInning?.conclusion === 'failure' ? 'bg-red-600' :
+                              'bg-black'
+                            }`}>
+                              <div className="text-2xl font-bold">
+                                {topInning?.conclusion === 'success' ? '0' :
+                                 topInning?.conclusion === 'failure' ? '0' :
+                                 topInning?.status === 'in_progress' ? '' :
+                                 topInning?.status === 'completed' ? '0' : ''}
+                              </div>
+                              {topInning && (
+                                <div className="text-xs mt-1 truncate" title={topInning.name}>
+                                  {topInning.name.substring(0, 10)}
+                                </div>
+                              )}
+                            </td>
+                          );
+                        })}
+                        <td className="border-2 border-white p-2 text-center bg-black">
+                          <div className="text-3xl font-bold">
+                            {scoreboard.filter((_, i) => i % 2 === 0 && scoreboard[i]?.conclusion === 'success').length}
                           </div>
-                        )}
-                      </div>
-                    );
-                  })}
+                        </td>
+                      </tr>
+                      
+                      {/* HOME Row (말 - Bottom of innings) */}
+                      <tr className="bg-gray-900">
+                        <td className="border-2 border-white p-3 font-bold text-lg">HOME<br/><span className="text-sm text-gray-400">(말)</span></td>
+                        {Array.from({ length: Math.ceil(scoreboard.length / 2) }, (_, inningNum) => {
+                          const bottomInning = scoreboard[inningNum * 2 + 1];
+                          return (
+                            <td key={inningNum} className={`border-2 border-white p-2 text-center ${
+                              bottomInning?.status === 'in_progress' ? 'bg-yellow-500 animate-pulse' :
+                              bottomInning?.conclusion === 'success' ? 'bg-green-600' :
+                              bottomInning?.conclusion === 'failure' ? 'bg-red-600' :
+                              'bg-black'
+                            }`}>
+                              <div className="text-2xl font-bold">
+                                {bottomInning?.conclusion === 'success' ? '0' :
+                                 bottomInning?.conclusion === 'failure' ? '0' :
+                                 bottomInning?.status === 'in_progress' ? '' :
+                                 bottomInning?.status === 'completed' ? '0' : ''}
+                              </div>
+                              {bottomInning && (
+                                <div className="text-xs mt-1 truncate" title={bottomInning.name}>
+                                  {bottomInning.name.substring(0, 10)}
+                                </div>
+                              )}
+                            </td>
+                          );
+                        })}
+                        <td className="border-2 border-white p-2 text-center bg-black">
+                          <div className="text-3xl font-bold">
+                            {scoreboard.filter((_, i) => i % 2 === 1 && scoreboard[i]?.conclusion === 'success').length}
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
                 
                 {/* Live Update Indicator */}

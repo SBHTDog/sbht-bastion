@@ -154,7 +154,7 @@ export async function analyzeFailureWithAI(errorLogs: string, jobName: string) {
             content: `Analyze this GitHub Actions deployment failure for job "${jobName}":\n\n${errorLogs}\n\nProvide: 1) Summary, 2) Root causes, 3) Specific fix suggestions`,
           },
         ],
-        max_tokens: 1000,
+        max_completion_tokens: 1000,
       }),
     });
 
@@ -205,7 +205,7 @@ export async function analyzeSuccessfulDeployment(allLogs: string, runSummary: s
             content: `Analyze this successful GitHub Actions deployment:\n\nSummary: ${runSummary}\n\nLogs:\n${allLogs.slice(0, 8000)}\n\nProvide: 1) Overall assessment, 2) Performance observations, 3) Optimization suggestions, 4) Best practice recommendations`,
           },
         ],
-        max_tokens: 1500,
+        max_completion_tokens: 1500,
       }),
     });
 
