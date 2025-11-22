@@ -151,19 +151,32 @@ export async function analyzeFailureWithAI(errorLogs: string, jobName: string) {
           },
           {
             role: 'user',
-            content: `Analyze this GitHub Actions deployment failure for job "${jobName}":\n\n${errorLogs}\n\nProvide: 1) Summary, 2) Root causes, 3) Specific fix suggestions`,
+            content: `Analyze this GitHub Actions deployment failure for job "${jobName}":\n\n${errorLogs}\n\nProvide: 1) Summary, 2) Root causes, 3) Specific fix suggestions. Do not insert any further question in the response.`,
           },
-        ],
-        max_completion_tokens: 1000,
+        ]
       }),
     });
 
-    const data = await response.json();
-    console.log('OpenAI response data:', data);
-    const analysis = data.choices[0].message.content;
-    console.log(analysis);
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('OpenAI API error:', errorData);
+      throw new Error(`OpenAI API error: ${errorData.error?.message || response.statusText}`);
+    }
 
-    // Parse the AI response
+    const data = await response.json();
+    
+    if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+      console.error('Unexpected OpenAI response structure:', data);
+      throw new Error('Invalid response structure from OpenAI');
+    }
+
+    const analysis = data.choices[0].message.content;
+
+    if (!analysis || analysis.trim() === '') {
+      console.error('Empty content from OpenAI:', data);
+      throw new Error('Empty response from OpenAI');
+    }
+
     return {
       summary: analysis,
       confidence: 85,
@@ -171,7 +184,7 @@ export async function analyzeFailureWithAI(errorLogs: string, jobName: string) {
   } catch (error) {
     console.error('OpenAI API error:', error);
     return {
-      summary: 'Failed to analyze with AI',
+      summary: `Failed to analyze with AI: ${error instanceof Error ? error.message : 'Unknown error'}`,
       rootCauses: [],
       suggestions: [],
     };
@@ -203,17 +216,31 @@ export async function analyzeSuccessfulDeployment(allLogs: string, runSummary: s
           },
           {
             role: 'user',
-            content: `Analyze this successful GitHub Actions deployment:\n\nSummary: ${runSummary}\n\nLogs:\n${allLogs.slice(0, 8000)}\n\nProvide: 1) Overall assessment, 2) Performance observations, 3) Optimization suggestions, 4) Best practice recommendations`,
+            content: `Analyze this successful GitHub Actions deployment:\n\nSummary: ${runSummary}\n\nLogs:\n${allLogs.slice(0, 8000)}\n\nProvide: 1) Overall assessment, 2) Performance observations, 3) Optimization suggestions, 4) Best practice recommendations. Do not insert any further question in the response.`,
           },
         ],
-        max_completion_tokens: 1500,
       }),
     });
 
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('OpenAI API error:', errorData);
+      throw new Error(`OpenAI API error: ${errorData.error?.message || response.statusText}`);
+    }
+
     const data = await response.json();
-    console.log('OpenAI response data:', data);
+    
+    if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+      console.error('Unexpected OpenAI response structure:', data);
+      throw new Error('Invalid response structure from OpenAI');
+    }
+
     const analysis = data.choices[0].message.content;
-    console.log(analysis);
+
+    if (!analysis || analysis.trim() === '') {
+      console.error('Empty content from OpenAI:', data);
+      throw new Error('Empty response from OpenAI');
+    }
 
     return {
       summary: analysis,
@@ -221,7 +248,7 @@ export async function analyzeSuccessfulDeployment(allLogs: string, runSummary: s
   } catch (error) {
     console.error('OpenAI API error:', error);
     return {
-      summary: 'Failed to analyze deployment',
+      summary: `Failed to analyze deployment: ${error instanceof Error ? error.message : 'Unknown error'}`,
     };
   }
 }
