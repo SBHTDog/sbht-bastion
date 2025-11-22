@@ -71,6 +71,8 @@ export default function DeploymentDashboard() {
         try {
           const data: WebhookEvent = JSON.parse(event.data);
           setLastWebhookEvent(data);
+
+          console.log('Received webhook event via SSE:', data);
           
           // If it's a workflow or check event, refresh deployments
           if (data.event === 'workflow_run' || data.event === 'workflow_job' || 
