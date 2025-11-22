@@ -143,7 +143,7 @@ export async function analyzeFailureWithAI(errorLogs: string, jobName: string) {
         'Authorization': `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: 'gpt-4-turbo-preview',
+        model: 'gpt-5-mini',
         messages: [
           {
             role: 'system',
@@ -159,6 +159,7 @@ export async function analyzeFailureWithAI(errorLogs: string, jobName: string) {
     });
 
     const data = await response.json();
+    console.log('OpenAI response data:', data);
     const analysis = data.choices[0].message.content;
 
     // Parse the AI response
@@ -193,7 +194,7 @@ export async function analyzeSuccessfulDeployment(allLogs: string, runSummary: s
         'Authorization': `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: 'gpt-4-turbo-preview',
+        model: 'gpt-5-mini',
         messages: [
           {
             role: 'system',
@@ -209,6 +210,7 @@ export async function analyzeSuccessfulDeployment(allLogs: string, runSummary: s
     });
 
     const data = await response.json();
+    console.log('OpenAI response data:', data);
     const analysis = data.choices[0].message.content;
 
     return {
