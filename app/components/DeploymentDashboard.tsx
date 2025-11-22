@@ -422,19 +422,18 @@ export default function DeploymentDashboard() {
                   <table className="w-full border-2 border-white text-white">
                     <thead>
                       <tr className="bg-red-600">
-                        <th className="border-2 border-white p-2 text-left font-bold text-sm">TEAM</th>
+                        <th className="border-2 border-white p-2 text-left font-bold text-sm">Inning</th>
                         {Array.from({ length: Math.ceil(scoreboard.length / 2) }, (_, i) => (
                           <th key={i} className="border-2 border-white p-2 text-center font-bold text-lg min-w-[60px]">
                             {i + 1}
                           </th>
                         ))}
-                        <th className="border-2 border-white p-2 text-center font-bold text-sm bg-red-700">RUNS</th>
                       </tr>
                     </thead>
                     <tbody>
                       {/* GUEST Row (초 - Top of innings) */}
                       <tr className="bg-gray-900">
-                        <td className="border-2 border-white p-3 font-bold text-lg">GUEST<br/><span className="text-sm text-gray-400">(초)</span></td>
+                        <td className="border-2 border-white p-3 font-bold text-lg">TOP</td>
                         {Array.from({ length: Math.ceil(scoreboard.length / 2) }, (_, inningNum) => {
                           const topInning = scoreboard[inningNum * 2];
                           return (
@@ -442,32 +441,30 @@ export default function DeploymentDashboard() {
                               topInning?.status === 'in_progress' ? 'bg-yellow-500 animate-pulse' :
                               topInning?.conclusion === 'success' ? 'bg-green-600' :
                               topInning?.conclusion === 'failure' ? 'bg-red-600' :
+                              topInning?.conclusion === 'skipped' ? 'bg-gray-600' :
                               'bg-black'
                             }`}>
                               <div className="text-2xl font-bold">
-                                {topInning?.conclusion === 'success' ? '0' :
-                                 topInning?.conclusion === 'failure' ? '0' :
-                                 topInning?.status === 'in_progress' ? '' :
-                                 topInning?.status === 'completed' ? '0' : ''}
+                                {topInning?.conclusion === 'success' ? '✓' :
+                                 topInning?.conclusion === 'failure' ? '✗' :
+                                 topInning?.conclusion === 'skipped' ? '⊘' :
+                                 topInning?.status === 'in_progress' ? '⏳' :
+                                 topInning?.status === 'queued' ? '⏸' :
+                                 topInning?.status === 'completed' ? '○' : ''}
                               </div>
                               {topInning && (
                                 <div className="text-xs mt-1 truncate" title={topInning.name}>
-                                  {topInning.name.substring(0, 10)}
+                                  {topInning.name.split(':')[1] || topInning.name.substring(0, 10)}
                                 </div>
                               )}
                             </td>
                           );
                         })}
-                        <td className="border-2 border-white p-2 text-center bg-black">
-                          <div className="text-3xl font-bold">
-                            {scoreboard.filter((_, i) => i % 2 === 0 && scoreboard[i]?.conclusion === 'success').length}
-                          </div>
-                        </td>
                       </tr>
                       
                       {/* HOME Row (말 - Bottom of innings) */}
                       <tr className="bg-gray-900">
-                        <td className="border-2 border-white p-3 font-bold text-lg">HOME<br/><span className="text-sm text-gray-400">(말)</span></td>
+                        <td className="border-2 border-white p-3 font-bold text-lg">BOT</td>
                         {Array.from({ length: Math.ceil(scoreboard.length / 2) }, (_, inningNum) => {
                           const bottomInning = scoreboard[inningNum * 2 + 1];
                           return (
@@ -475,13 +472,16 @@ export default function DeploymentDashboard() {
                               bottomInning?.status === 'in_progress' ? 'bg-yellow-500 animate-pulse' :
                               bottomInning?.conclusion === 'success' ? 'bg-green-600' :
                               bottomInning?.conclusion === 'failure' ? 'bg-red-600' :
+                              bottomInning?.conclusion === 'skipped' ? 'bg-gray-600' :
                               'bg-black'
                             }`}>
                               <div className="text-2xl font-bold">
-                                {bottomInning?.conclusion === 'success' ? '0' :
-                                 bottomInning?.conclusion === 'failure' ? '0' :
-                                 bottomInning?.status === 'in_progress' ? '' :
-                                 bottomInning?.status === 'completed' ? '0' : ''}
+                                {bottomInning?.conclusion === 'success' ? '✓' :
+                                 bottomInning?.conclusion === 'failure' ? '✗' :
+                                 bottomInning?.conclusion === 'skipped' ? '⊘' :
+                                 bottomInning?.status === 'in_progress' ? '⏳' :
+                                 bottomInning?.status === 'queued' ? '⏸' :
+                                 bottomInning?.status === 'completed' ? '○' : ''}
                               </div>
                               {bottomInning && (
                                 <div className="text-xs mt-1 truncate" title={bottomInning.name}>
@@ -491,11 +491,6 @@ export default function DeploymentDashboard() {
                             </td>
                           );
                         })}
-                        <td className="border-2 border-white p-2 text-center bg-black">
-                          <div className="text-3xl font-bold">
-                            {scoreboard.filter((_, i) => i % 2 === 1 && scoreboard[i]?.conclusion === 'success').length}
-                          </div>
-                        </td>
                       </tr>
                     </tbody>
                   </table>
