@@ -17,8 +17,14 @@ interface WorkflowRun {
   };
   run_number: number;
 }
+ 
+interface WebHookEvent{
+  type: string;
+  data: WebhookEventData;
+  timestamp: string;
+}
 
-interface WebhookEvent {
+interface WebhookEventData {
   event: string;
   payload: any;
   recordId: number;
@@ -35,7 +41,7 @@ export default function DeploymentDashboard() {
   const [loadingJobLog, setLoadingJobLog] = useState<number | null>(null);
   const [aiAnalysis, setAiAnalysis] = useState<any>(null);
   const [analyzingRun, setAnalyzingRun] = useState<number | null>(null);
-  const [lastWebhookEvent, setLastWebhookEvent] = useState<WebhookEvent | null>(null);
+  const [lastWebhookEvent, setLastWebhookEvent] = useState<WebhookEventData | null>(null);
   const [sseConnected, setSSEConnected] = useState(false);
   const eventSourceRef = useRef<EventSource | null>(null);
   
@@ -69,15 +75,15 @@ export default function DeploymentDashboard() {
 
       eventSource.onmessage = (event) => {
         try {
-          const data: WebhookEvent = JSON.parse(event.data);
-          setLastWebhookEvent(data);
+          const eventJson: WebHookEvent = JSON.parse(event.data);
+          setLastWebhookEvent(eventJson.data);
 
-          console.log('Received webhook event via SSE:', data);
-          console.log('typeof data.event: ',typeof data.event);
+          console.log('Received webhook event via SSE:', eventJson);
+          console.log('typeof eventJson.data.event: ',typeof eventJson.data.event);
           // If it's a workflow or check event, refresh deployments
-          if (data.event == 'workflow_run' || data.event == 'workflow_job' || 
-              data.event == 'check_run' || data.event == 'check_suite') {
-            console.log('Deployment event received, refreshing...', data.event);
+          if (eventJson.data.event == 'workflow_run' || eventJson.data.event == 'workflow_job' || 
+              eventJson.data.event == 'check_run' || eventJson.data.event == 'check_suite') {
+            console.log('Deployment event received, refreshing...', eventJson.data.event);
             fetchDeployments();
           }
         } catch (error) {
