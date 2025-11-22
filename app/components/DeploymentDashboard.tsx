@@ -495,12 +495,6 @@ export default function DeploymentDashboard() {
                   </table>
                 </div>
                 
-                {/* Live Update Indicator */}
-                {latestRun.status === 'in_progress' && (
-                  <div className="text-center mt-4 text-yellow-400 text-sm animate-pulse">
-                    🔴 LIVE • Updating every 10 seconds
-                  </div>
-                )}
               </div>
             )}
 
@@ -521,7 +515,7 @@ export default function DeploymentDashboard() {
             </div>
 
             {/* Live Logs Section - Only for in-progress runs */}
-            {latestRun.status === 'in_progress' && liveRunDetails && liveRunDetails.jobs && (
+            {/* {latestRun.status === 'in_progress' && liveRunDetails && liveRunDetails.jobs && (
               <div className="mb-6 bg-gray-800/30 rounded-xl p-6 border-2 border-blue-500">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-blue-300 font-bold text-lg">📡 Live Deployment Logs</h3>
@@ -576,7 +570,7 @@ export default function DeploymentDashboard() {
                   ))}
                 </div>
               </div>
-            )}
+            )} */}
 
             {/* AI Deployment Advice - Only for successful deployments */}
             {latestRun.conclusion === 'success' && liveRunDetails && (
